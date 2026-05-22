@@ -1,0 +1,12 @@
+model Image {
+  id          Int        @id @default(autoincrement())
+  url         String
+  reportId    Int?
+  report      Report?    @relation(fields: [reportId], references: [id])
+  complaintId Int?
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  filename    String
+  size        Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
