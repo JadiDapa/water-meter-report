@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(Test-Path \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\README.md\")"
+      "Bash(Test-Path \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\README.md\")",
+      "WebFetch(domain:clerk.com)"
     ]
   }
 }

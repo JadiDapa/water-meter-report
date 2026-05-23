@@ -4,21 +4,21 @@ import { ArrowUpRight, ArrowDownRight, UsersIcon } from "lucide-react";
 
 const stats = [
   {
-    title: "Total Technicians",
+    title: "Total Teknisi",
     value: "12,450",
     change: "15.8%",
     trend: "up",
     icon: UsersIcon,
   },
   {
-    title: "Active Technicians",
+    title: "Teknisi Aktif",
     value: "8,320",
     change: "5.2%",
     trend: "up",
     icon: UsersIcon,
   },
   {
-    title: "Inactive Technicians",
+    title: "Teknisi Tidak Aktif",
     value: "4,130",
     change: "2.1%",
     trend: "down",
@@ -28,14 +28,9 @@ const stats = [
 
 export default function TechnicianStats() {
   return (
-    <div className="bg-card flex flex-row overflow-hidden rounded-xl border px-6 py-4">
+    <div className="bg-border grid grid-cols-1 gap-px overflow-hidden rounded-xl border sm:grid-cols-3">
       {stats.map((stat, i) => (
-        <div
-          key={i}
-          className={`flex flex-1 items-center justify-between p-6 ${
-            i !== stats.length - 1 ? "border-r" : ""
-          }`}
-        >
+        <div key={i} className="bg-card flex items-center justify-between p-4 sm:p-6">
           <div className="flex flex-1 items-center gap-4">
             <div className="bg-primary text-primary-foreground rounded-md p-2">
               <stat.icon />
@@ -48,7 +43,6 @@ export default function TechnicianStats() {
             </div>
           </div>
 
-          {/* Right */}
           <div
             className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${
               stat.trend === "up"

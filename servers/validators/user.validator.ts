@@ -20,7 +20,9 @@ const UserBaseSchema = z.object({
   role: z.enum(UserRole),
 });
 
-export const CreateUserSchema = UserBaseSchema;
+export const CreateUserSchema = UserBaseSchema.extend({
+  password: z.string().min(8, "Password minimal 8 karakter"),
+});
 
 export const UpdateUserSchema = UserBaseSchema.partial();
 

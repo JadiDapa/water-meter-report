@@ -37,7 +37,7 @@ async function main() {
   // ─── Users ────────────────────────────────────────────────────────────────
   // IMPORTANT: Usernames must match Clerk account usernames exactly.
   const userData = [
-    { name: "Administrator", username: "admin", role: UserRole.ADMIN },
+    { name: "Administrator", username: "administrator", role: UserRole.ADMIN },
     { name: "Tech One", username: "techone", role: UserRole.TECHNICIAN },
     { name: "Customer One", username: "customerone", role: UserRole.CUSTOMER },
   ];

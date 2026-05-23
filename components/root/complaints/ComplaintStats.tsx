@@ -72,15 +72,11 @@ export default function ComplaintStats({
       icon: Users,
     },
   ];
+
   return (
-    <div className="bg-card flex flex-row overflow-hidden rounded-xl border px-6 py-4">
+    <div className="bg-border grid grid-cols-1 overflow-hidden rounded-xl border gap-px sm:grid-cols-3">
       {stats.map((stat, i) => (
-        <div
-          key={i}
-          className={`flex flex-1 items-center justify-between p-6 ${
-            i !== stats.length - 1 ? "border-r" : ""
-          }`}
-        >
+        <div key={i} className="bg-card flex items-center justify-between p-4 sm:p-6">
           <div className="flex flex-1 items-center gap-4">
             <div className="bg-primary text-primary-foreground rounded-md p-2">
               <stat.icon />
@@ -93,7 +89,6 @@ export default function ComplaintStats({
             </div>
           </div>
 
-          {/* Right */}
           <div
             className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${
               stat.trend === "up"

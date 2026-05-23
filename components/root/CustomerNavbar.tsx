@@ -16,27 +16,29 @@ export default function CustomerNavbar({ user }: { user: User }) {
   };
 
   return (
-    <nav className="border-border bg-card sticky top-0 z-50 border-b px-6 py-3">
+    <nav className="border-border bg-card sticky top-0 z-50 border-b px-4 py-3 sm:px-6">
       <div className="mx-auto flex max-w-5xl items-center justify-between">
         {/* Brand */}
         <div className="flex items-center gap-2">
-          <Droplet className="text-primary size-6" />
+          <Droplet className="text-primary size-6 shrink-0" />
           <span className="text-foreground text-lg font-bold tracking-tight">
             Tirta Musi
           </span>
         </div>
 
         {/* Right side */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <ToggleTheme />
 
-          <div className="bg-border mx-1 h-5 w-px" />
+          <div className="bg-border mx-0.5 h-5 w-px sm:mx-1" />
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2">
+            {/* Avatar — always visible */}
             <div className="bg-primary text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
               {(user?.name || "U").charAt(0).toUpperCase()}
             </div>
-            <div className="flex flex-col leading-tight">
+            {/* Name + role — hidden on xs, shown on sm+ */}
+            <div className="hidden flex-col leading-tight sm:flex">
               <span className="text-foreground text-sm font-semibold">
                 {user?.name}
               </span>

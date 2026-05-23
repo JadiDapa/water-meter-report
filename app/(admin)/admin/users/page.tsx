@@ -2,6 +2,7 @@ import PageHeader from "@/components/root/PageHeader";
 import { UserService } from "@/servers/services/user.service";
 import DynamicBreadcrumb from "@/components/root/DynamicBreadcrumb";
 import CreateUserDialog from "@/components/root/user/CreateUserDialog";
+import ImportUsersDialog from "@/components/root/user/ImportUsersDialog";
 import UserStats from "@/components/root/user/UserStats";
 import UserTable from "@/components/root/user/UserTable";
 
@@ -15,7 +16,10 @@ export default async function AdminUsersPage() {
           <DynamicBreadcrumb />
           <PageHeader title="Daftar Pengguna" subtitle="Kelola semua pengguna" />
         </div>
-        <CreateUserDialog />
+        <div className="flex items-center gap-2">
+          <ImportUsersDialog />
+          <CreateUserDialog />
+        </div>
       </div>
 
       <UserStats users={users} />

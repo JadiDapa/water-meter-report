@@ -1,52 +1,45 @@
 "use client";
 
-import { UserType } from "@/servers/validators/user.validator";
+import { User } from "@/generated/prisma";
 import { UsersIcon } from "lucide-react";
 
-export default function UserStats({ users }: { users: UserType[] }) {
+export default function UserStats({ users }: { users: User[] }) {
   const stats = [
     {
-      title: "Total All Users",
+      title: "Total Pengguna",
       value: users.length.toString(),
       icon: UsersIcon,
     },
     {
-      title: "Total Admins",
+      title: "Total Admin",
       value: users.filter((user) => user.role === "ADMIN").length.toString(),
       icon: UsersIcon,
     },
     {
-      title: "Total Technicians",
+      title: "Total Teknisi",
       value: users
         .filter((user) => user.role === "TECHNICIAN")
         .length.toString(),
       icon: UsersIcon,
     },
     {
-      title: "Total Customers",
+      title: "Total Pelanggan",
       value: users.filter((user) => user.role === "CUSTOMER").length.toString(),
       icon: UsersIcon,
     },
   ];
+
   return (
-    <div className="bg-card flex flex-row overflow-hidden rounded-xl border px-6 py-4">
+    // 2 cols on mobile → 4 cols on sm+
+    <div className="bg-border grid grid-cols-2 overflow-hidden rounded-xl border gap-px sm:grid-cols-4">
       {stats.map((stat, i) => (
-        <div
-          key={i}
-          className={`flex flex-1 items-center justify-between p-6 ${
-            i !== stats.length - 1 ? "border-r" : ""
-          }`}
-        >
-          <div className="flex flex-1 items-center gap-4">
-            <div className="bg-primary text-primary-foreground rounded-md p-2">
-              <stat.icon />
-            </div>
-            <div className="space-y-1">
-              <p className="text-muted-foreground text-xs">{stat.title}</p>
-              <h3 className="text-xl font-semibold tracking-tight">
-                {stat.value}
-              </h3>
-            </div>
+        <div key={i} className="bg-card flex items-center gap-4 p-4 sm:p-6">
+          <div className="bg-primary text-primary-foreground rounded-md p-2 shrink-0">
+            <stat.icon className="h-5 w-5" />
+          </div>
+          <div className="space-y-1 min-w-0">
+            <p className="text-muted-foreground text-xs truncate">{stat.title}</p>
+            <h3 className="text-xl font-semibold tracking-tight">{stat.value}</h3>
           </div>
         </div>
       ))}
