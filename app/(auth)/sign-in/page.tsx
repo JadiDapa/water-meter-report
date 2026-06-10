@@ -12,9 +12,7 @@ export default async function SignInPage() {
     <section className="bg-background relative flex min-h-screen justify-end overflow-hidden">
       <div className="relative h-screen w-full flex-3">
         <Image
-          src={
-            "https://perumdatirtamusi.co.id/images/joomlart/hero/HEADER%201.jpg#joomlaImage://local-images/joomlart/hero/HEADER%201.jpg?width=1920&height=824"
-          }
+          src={"/login-bg.jpeg"}
           fill
           alt=""
           className="object-cover object-bottom-left"
