@@ -4,9 +4,7 @@ import type {
   CreateReportDTO,
   UpdateReportDTO,
 } from "../validators/report.validator";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import { uploadImage } from "@/lib/cloudinary";
 
 export type ReportListOptions = {
   page?: number;
@@ -131,25 +129,33 @@ export const ReportService = {
   },
 
   async create(data: CreateReportDTO, images: File[] = []) {
-    const uploadDir = path.join(process.cwd(), "uploads", "images");
-    await mkdir(uploadDir, { recursive: true });
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
+    const existing = await prisma.report.findFirst({
+      where: {
+        customerId: data.customerId,
+        createdAt: { gte: monthStart, lt: monthEnd },
+      },
+    });
+
+    if (existing) {
+      const label = now.toLocaleString("id-ID", {
+        month: "long",
+        year: "numeric",
+      });
+      throw new Error(
+        `Laporan untuk pelanggan ini sudah ada pada bulan ${label}`,
+      );
+    }
 
     const imageRecords: { url: string; filename: string; size: number }[] = [];
 
     for (const file of images) {
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const uniqueFilename = `${randomUUID()}.${ext}`;
-      const filepath = path.join(uploadDir, uniqueFilename);
-
       const buffer = Buffer.from(await file.arrayBuffer());
-      await writeFile(filepath, buffer);
-
-      imageRecords.push({
-        url: `/api/images/${uniqueFilename}`,
-        filename: uniqueFilename,
-        size: file.size,
-      });
+      const { url, publicId } = await uploadImage(buffer, "water-meter/reports");
+      imageRecords.push({ url, filename: publicId, size: file.size });
     }
 
     const report = await prisma.report.create({

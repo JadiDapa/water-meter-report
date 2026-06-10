@@ -7,7 +7,16 @@
       "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\app\\\\\\(root\\)\")",
       "Bash(dir /s /b app/)",
       "Bash(findstr /E \"layout.tsx|page.tsx\")",
-      "Bash(PowerShell -Command \"Get-ChildItem -Path 'components\\\\root' -Recurse -File | Select-Object FullName\")"
+      "Bash(PowerShell -Command \"Get-ChildItem -Path 'components\\\\root' -Recurse -File | Select-Object FullName\")",
+      "Bash(findstr cloudinary *)",
+      "Bash(findstr /i \"cloudinary\")",
+      "Bash(findstr /i \"cloudinary\" package.json)",
+      "mcp__claude_ai_Context7__resolve-library-id",
+      "mcp__claude_ai_Context7__query-docs",
+      "PowerShell(Remove-Item -Recurse -Force \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\app\\\\api\\\\images\" -Confirm:$false)",
+      "PowerShell($timestamp = Get-Date -Format \"yyyyMMddHHmmss\"; New-Item -ItemType Directory -Path \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\prisma\\\\migrations\\\\${timestamp}_rename_rejected_to_cancelled\" -Force; Write-Output $timestamp)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs"
     ]
   }
 }

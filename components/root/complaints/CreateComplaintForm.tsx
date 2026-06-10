@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Customer } from "@/generated/prisma";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { X, ImagePlus, UploadCloud } from "lucide-react";
 import { createComplaint } from "@/app/actions/complaint.actions";
 
@@ -43,6 +43,7 @@ export default function CreateComplaintForm({
   customerId?: number;
   customers?: Customer[];
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -120,10 +121,12 @@ export default function CreateComplaintForm({
         images.forEach((img) => formData.append("images", img.file));
 
         await createComplaint(formData);
-        toast.success("Complaint created!");
-        return redirect("/complaints/my-complaints");
-      } catch {
-        toast.error("Something went wrong");
+        toast.success("Keluhan berhasil dibuat!");
+        router.push("/technician/my-complaints");
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Terjadi kesalahan";
+        toast.error(message);
       }
     });
   }
@@ -139,7 +142,10 @@ export default function CreateComplaintForm({
               render={({ field }) => (
                 <Field>
                   <FieldLabel>Customer</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value ? String(field.value) : ""}
+                    onValueChange={field.onChange}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder={"Pilih Customer..."} />
                     </SelectTrigger>

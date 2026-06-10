@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { Eye } from "lucide-react";
 import { ComplaintType } from "@/servers/validators/complaint.validator";
 import DataTable from "../DataTable";
 import SearchDataTable from "../SearchDataTable";
@@ -55,7 +56,7 @@ export const createComplaintColumns = (
     id: "index",
     header: ({ column }) => <TableSorter isFirst column={column} header="#" />,
     cell: ({ row }) => (
-      <div className="text-muted-foreground max-w-fit ps-5 text-center text-xs">
+      <div className="text-muted-foreground max-w-fit py-2 ps-5 text-center text-xs">
         {row.index + 1}
       </div>
     ),
@@ -125,15 +126,7 @@ export const createComplaintColumns = (
       </span>
     ),
   },
-  {
-    accessorKey: "location",
-    header: ({ column }) => <TableSorter column={column} header="LOCATION" />,
-    cell: ({ row }) => (
-      <span className="bg-muted rounded-md px-2 py-1 text-xs font-medium uppercase">
-        {row.original.location}
-      </span>
-    ),
-  },
+
   {
     id: "title",
     header: () => <span className="text-xs">TITLE</span>,
@@ -144,30 +137,62 @@ export const createComplaintColumns = (
     ),
   },
   {
+    accessorKey: "status",
+    header: ({ column }) => <TableSorter column={column} header="STATUS" />,
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const map = {
+        PENDING:
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+        FINISHED:
+          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+        CANCELLED:
+          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+      } as const;
+      const label = {
+        PENDING: "Menunggu",
+        FINISHED: "Selesai",
+        CANCELLED: "Dibatalkan",
+      } as const;
+      return (
+        <span
+          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${map[status]}`}
+        >
+          {label[status]}
+        </span>
+      );
+    },
+  },
+  {
     accessorKey: "createdAt",
     header: ({ column }) => <TableSorter column={column} header="CREATED" />,
     cell: ({ row }) => {
       const date = new Date(row.original.createdAt);
-
       return (
         <div className="flex flex-col text-sm leading-tight">
-          <span>{date.toLocaleDateString()}</span>
+          <span>
+            {date.toLocaleString("id-ID", { month: "long", year: "numeric" })}
+          </span>
           <span className="text-muted-foreground text-xs">
-            {date.toLocaleTimeString()}
+            {date.toLocaleString("id-ID", { day: "2-digit", month: "short" })}
           </span>
         </div>
       );
     },
   },
-  ...(showActions
-    ? [
-        {
-          id: "actions",
-          header: () => <span className="text-xs">ACTIONS</span>,
-          cell: ({ row }: { row: { original: ComplaintType } }) => (
-            <ComplaintRowActions complaint={row.original} />
-          ),
-        } as ColumnDef<ComplaintType>,
-      ]
-    : []),
+  {
+    id: "actions",
+    header: () => <span className="text-xs">ACTIONS</span>,
+    cell: ({ row }: { row: { original: ComplaintType } }) => (
+      <div className="flex items-center gap-1">
+        <Link
+          href={`${basePath}/${row.original.id}`}
+          className="text-muted-foreground hover:text-foreground inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+        >
+          <Eye className="h-4 w-4" />
+        </Link>
+        {showActions && <ComplaintRowActions complaint={row.original} />}
+      </div>
+    ),
+  } as ColumnDef<ComplaintType>,
 ];

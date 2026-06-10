@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Customer } from "@/generated/prisma";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { X, ImagePlus, UploadCloud } from "lucide-react";
 
 type ReportFormType = z.infer<typeof CreateReportSchema>;
@@ -43,6 +43,7 @@ export default function CreateReportDialog({
   customerId?: number;
   customers?: Customer[];
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<ImagePreview[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -118,10 +119,12 @@ export default function CreateReportDialog({
         images.forEach((img) => formData.append("images", img.file));
 
         await createReport(formData);
-        toast.success("Report created!");
-        return redirect("/technician/my-reports");
-      } catch {
-        toast.error("Something went wrong");
+        toast.success("Laporan berhasil dibuat!");
+        router.push("/technician/my-reports");
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Terjadi kesalahan";
+        toast.error(message);
       }
     });
   }
@@ -137,7 +140,10 @@ export default function CreateReportDialog({
               render={({ field }) => (
                 <Field>
                   <FieldLabel>Customer</FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value ? String(field.value) : ""}
+                    onValueChange={field.onChange}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder={"Pilih Customer..."} />
                     </SelectTrigger>

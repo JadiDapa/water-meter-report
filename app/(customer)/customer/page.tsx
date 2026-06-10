@@ -6,8 +6,10 @@ import WaterUsageChart from "@/components/root/user/customer/WaterUsageChart";
 import UsageStats from "@/components/root/user/customer/UsageStats";
 import ReportCard from "@/components/root/user/customer/reports/ReportCard";
 import ComplaintCard from "@/components/root/user/customer/complaints/ComplaintCard";
+import PendingComplaintBanner from "@/components/root/user/customer/complaints/PendingComplaintBanner";
 import PageHeader from "@/components/root/PageHeader";
 import Link from "next/link";
+import { ComplaintStatus } from "@/generated/prisma";
 
 export default async function CustomerHomePage() {
   const user = await getCurrentUser();
@@ -29,14 +31,30 @@ export default async function CustomerHomePage() {
     );
   }
 
-  const reports = await ReportService.getByCustomerId(customerProfile.id);
-  const complaints = await ComplaintService.getByCustomerId(customerProfile.id);
+  const rawReports = await ReportService.getByCustomerId(customerProfile.id);
+  const reports = [...rawReports].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+
+  const rawComplaints = await ComplaintService.getByCustomerId(
+    customerProfile.id,
+  );
+
+  const complaints = [...rawComplaints].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+  const featuredComplaint = complaints.find(
+    (c) => c.status === ComplaintStatus.PENDING,
+  );
+  const otherComplaints = featuredComplaint
+    ? complaints.filter((c) => c.id !== featuredComplaint.id)
+    : complaints;
 
   return (
     <div className="space-y-8">
       <PageHeader
         title={`Halo, ${user.name}!`}
-        subtitle={`ID Pelanggan: ${customerProfile.customerId} · ${customerProfile.building?.name ?? customerProfile.buildingSlug}`}
+        subtitle={`ID Pelanggan: ${customerProfile.customerId} · ${customerProfile.buildingSlug}`}
       />
 
       <div className="flex flex-col gap-6 lg:flex-row">
@@ -50,9 +68,12 @@ export default async function CustomerHomePage() {
           <p className="text-muted-foreground text-sm">Belum ada laporan.</p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {reports.map((report) => (
+            {reports.map((report, i) => (
               <Link key={report.id} href={`/customer/reports/${report.id}`}>
-                <ReportCard report={report} />
+                <ReportCard
+                  report={report}
+                  previousValue={i > 0 ? Number(reports[i - 1].values) : undefined}
+                />
               </Link>
             ))}
           </div>
@@ -64,15 +85,22 @@ export default async function CustomerHomePage() {
         {complaints.length === 0 ? (
           <p className="text-muted-foreground text-sm">Belum ada keluhan.</p>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {complaints.map((complaint) => (
-              <Link
-                key={complaint.id}
-                href={`/customer/complaints/${complaint.id}`}
-              >
-                <ComplaintCard complaint={complaint} />
-              </Link>
-            ))}
+          <div className="space-y-4">
+            {featuredComplaint && (
+              <PendingComplaintBanner complaint={featuredComplaint} />
+            )}
+            {otherComplaints.length > 0 && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                {otherComplaints.map((complaint) => (
+                  <Link
+                    key={complaint.id}
+                    href={`/customer/complaints/${complaint.id}`}
+                  >
+                    <ComplaintCard complaint={complaint} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

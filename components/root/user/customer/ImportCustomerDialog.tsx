@@ -18,24 +18,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  importUsers,
-  type ImportRow,
-  type ImportResult,
-} from "@/app/actions/user.actions";
+  importCustomers,
+  type ImportCustomerRow,
+  type ImportCustomerResult,
+} from "@/app/actions/customer.actions";
 
-const EXPECTED_COLS = ["name", "username", "password", "role"];
+const EXPECTED_COLS = [
+  "customerId",
+  "fullname",
+  "phoneNumber",
+  "address",
+  "buildingSlug",
+];
 
-const ROLE_LABELS: Record<string, string> = {
-  ADMIN: "Admin",
-  CUSTOMER: "Pelanggan",
-  TECHNICIAN: "Teknisi",
+const COL_LABELS: Record<string, string> = {
+  customerId: "ID Pelanggan",
+  fullname: "Nama Lengkap",
+  phoneNumber: "No. Telepon",
+  address: "Alamat",
+  buildingSlug: "Slug Bangunan",
 };
 
-export default function ImportUsersDialog() {
+export default function ImportCustomerDialog() {
   const [open, setOpen] = useState(false);
-  const [rows, setRows] = useState<ImportRow[] | null>(null);
+  const [rows, setRows] = useState<ImportCustomerRow[] | null>(null);
   const [parseError, setParseError] = useState<string | null>(null);
-  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importResult, setImportResult] =
+    useState<ImportCustomerResult | null>(null);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -58,20 +67,19 @@ export default function ImportUsersDialog() {
           return;
         }
 
-        const headers = Object.keys(json[0]).map((h) => h.trim().toLowerCase());
-        const missing = EXPECTED_COLS.filter(
-          (c) => !headers.includes(c.toLowerCase()),
-        );
+        const headers = Object.keys(json[0]).map((h) => h.trim());
+        const missing = EXPECTED_COLS.filter((c) => !headers.includes(c));
         if (missing.length > 0) {
           setParseError(`Kolom tidak ditemukan: ${missing.join(", ")}`);
           return;
         }
 
-        const parsed: ImportRow[] = json.map((r) => ({
-          name: String(r["name"] ?? "").trim(),
-          username: String(r["username"] ?? "").trim(),
-          password: String(r["password"] ?? "").trim(),
-          role: String(r["role"] ?? "").trim().toUpperCase(),
+        const parsed: ImportCustomerRow[] = json.map((r) => ({
+          customerId: String(r["customerId"] ?? "").trim(),
+          fullname: String(r["fullname"] ?? "").trim(),
+          phoneNumber: String(r["phoneNumber"] ?? "").trim(),
+          address: String(r["address"] ?? "").trim(),
+          buildingSlug: String(r["buildingSlug"] ?? "").trim(),
         }));
 
         setRows(parsed);
@@ -97,9 +105,9 @@ export default function ImportUsersDialog() {
     if (!rows) return;
     setImportResult(null);
     startTransition(async () => {
-      const result = await importUsers(rows);
+      const result = await importCustomers(rows);
       if (result.failed.length === 0) {
-        toast.success(`${result.success} pengguna berhasil diimpor!`);
+        toast.success(`${result.success} pelanggan berhasil diimpor!`);
         setOpen(false);
         reset();
       } else {
@@ -127,7 +135,10 @@ export default function ImportUsersDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="w-full cursor-pointer gap-2 sm:w-auto">
+        <Button
+          variant="outline"
+          className="w-full cursor-pointer gap-2 sm:w-auto"
+        >
           <FileSpreadsheet className="size-4" />
           Import Excel / CSV
         </Button>
@@ -135,7 +146,7 @@ export default function ImportUsersDialog() {
 
       <DialogContent className="max-w-3xl!">
         <DialogHeader>
-          <DialogTitle>Import Pengguna dari File</DialogTitle>
+          <DialogTitle>Import Pelanggan dari File</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -145,12 +156,13 @@ export default function ImportUsersDialog() {
             <span className="text-foreground font-mono">
               {EXPECTED_COLS.join(", ")}
             </span>
-            . Nilai kolom{" "}
-            <span className="text-foreground font-mono">role</span> yang valid:{" "}
-            <span className="text-foreground font-mono">
-              ADMIN, CUSTOMER, TECHNICIAN
-            </span>
-            .
+            . Kolom{" "}
+            <span className="text-foreground font-mono">buildingSlug</span>{" "}
+            diisi dengan slug bangunan (contoh:{" "}
+            <span className="text-foreground font-mono">gedung-a</span>).
+            Username akun ={" "}
+            <span className="text-foreground font-mono">p_[nomor telepon]</span>
+            , password = ID pelanggan.
           </p>
 
           {/* Drop zone */}
@@ -195,7 +207,7 @@ export default function ImportUsersDialog() {
                     <tr>
                       {EXPECTED_COLS.map((c) => (
                         <th key={c} className="px-3 py-2 text-left font-medium">
-                          {c}
+                          {COL_LABELS[c]}
                         </th>
                       ))}
                     </tr>
@@ -203,20 +215,17 @@ export default function ImportUsersDialog() {
                   <tbody>
                     {rows.slice(0, 5).map((r, i) => (
                       <tr key={i} className="border-border/40 border-t">
-                        <td className="px-3 py-1.5">{r.name}</td>
-                        <td className="px-3 py-1.5">{r.username}</td>
-                        <td className="text-muted-foreground px-3 py-1.5">
-                          {"•".repeat(Math.min(r.password.length, 8))}
-                        </td>
-                        <td className="px-3 py-1.5">
-                          {ROLE_LABELS[r.role] ?? r.role}
-                        </td>
+                        <td className="px-3 py-1.5">{r.customerId}</td>
+                        <td className="px-3 py-1.5">{r.fullname}</td>
+                        <td className="px-3 py-1.5">{r.phoneNumber}</td>
+                        <td className="px-3 py-1.5">{r.address}</td>
+                        <td className="px-3 py-1.5">{r.buildingSlug}</td>
                       </tr>
                     ))}
                     {rows.length > 5 && (
                       <tr className="border-border/40 border-t">
                         <td
-                          colSpan={4}
+                          colSpan={5}
                           className="text-muted-foreground px-3 py-1.5 text-center"
                         >
                           +{rows.length - 5} baris lagi
@@ -233,8 +242,8 @@ export default function ImportUsersDialog() {
           {importResult && importResult.failed.length > 0 && (
             <div className="space-y-1">
               <p className="text-xs font-medium text-red-600">
-                {importResult.success} berhasil,{" "}
-                {importResult.failed.length} baris gagal:
+                {importResult.success} berhasil, {importResult.failed.length}{" "}
+                baris gagal:
               </p>
               <div className="max-h-36 overflow-auto rounded-lg border border-red-200 bg-red-500/5 text-xs">
                 {importResult.failed.map((f) => (

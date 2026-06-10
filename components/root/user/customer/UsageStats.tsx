@@ -18,27 +18,37 @@ interface UsageStatsProps {
 }
 
 export default function UsageStats({ reports }: UsageStatsProps) {
-  const totalUsage = reports.reduce((sum, r) => sum + Number(r.values), 0);
+  const sorted = [...reports].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+
+  const deltas = sorted.map((r, i) => {
+    const current = Number(r.values);
+    const previous = i > 0 ? Number(sorted[i - 1].values) : 0;
+    return { report: r, usage: current - previous };
+  });
+
+  const totalUsage = deltas.reduce((sum, d) => sum + d.usage, 0);
 
   const now = new Date();
   const thisMonth = now.getMonth();
   const thisYear = now.getFullYear();
 
-  const thisMonthUsage = reports
-    .filter((r) => {
+  const thisMonthUsage = deltas
+    .filter(({ report: r }) => {
       const d = new Date(r.createdAt);
       return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
     })
-    .reduce((sum, r) => sum + Number(r.values), 0);
+    .reduce((sum, d) => sum + d.usage, 0);
 
-  const lastMonthUsage = reports
-    .filter((r) => {
+  const lastMonthUsage = deltas
+    .filter(({ report: r }) => {
       const d = new Date(r.createdAt);
       const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
       const lastYear = thisMonth === 0 ? thisYear - 1 : thisYear;
       return d.getMonth() === lastMonth && d.getFullYear() === lastYear;
     })
-    .reduce((sum, r) => sum + Number(r.values), 0);
+    .reduce((sum, d) => sum + d.usage, 0);
 
   const diff = thisMonthUsage - lastMonthUsage;
   const diffPercent =

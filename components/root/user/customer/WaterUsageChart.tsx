@@ -49,12 +49,18 @@ interface WaterUsageChartProps {
 }
 
 export default function WaterUsageChart({ reports }: WaterUsageChartProps) {
-  const chartData = reports.map((report) => ({
-    month: new Date(report.createdAt).toLocaleString("default", {
-      month: "short",
-    }),
-    values: Number(report.values),
-  }));
+  const sorted = [...reports].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+  );
+
+  const chartData = sorted.map((report, i) => {
+    const current = Number(report.values);
+    const previous = i > 0 ? Number(sorted[i - 1].values) : 0;
+    return {
+      month: new Date(report.createdAt).toLocaleString("id-ID", { month: "short" }),
+      values: current - previous,
+    };
+  });
 
   return (
     <Tabs

@@ -1,5 +1,6 @@
 import { Prisma } from "@/generated/prisma";
 import { z } from "zod";
+import { ComplaintStatus } from "@/generated/prisma";
 
 export type ComplaintType = Prisma.ComplaintGetPayload<{
   include: {
@@ -35,5 +36,14 @@ export const CreateComplaintSchema = ComplaintBaseSchema.extend({});
 
 export const UpdateComplaintSchema = ComplaintBaseSchema.partial();
 
+export const ResolveComplaintSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal(ComplaintStatus.FINISHED) }),
+  z.object({
+    action: z.literal(ComplaintStatus.CANCELLED),
+    cancellationReason: z.string().min(1, "Alasan pembatalan wajib diisi"),
+  }),
+]);
+
 export type CreateComplaintDTO = z.infer<typeof CreateComplaintSchema>;
 export type UpdateComplaintDTO = z.infer<typeof UpdateComplaintSchema>;
+export type ResolveComplaintDTO = z.infer<typeof ResolveComplaintSchema>;

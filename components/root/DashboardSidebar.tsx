@@ -37,9 +37,10 @@ import {
 type Props = {
   user: User;
   role: "ADMIN" | "TECHNICIAN";
+  pendingComplaintCount?: number;
 };
 
-export default function DashboardSidebar({ user, role }: Props) {
+export default function DashboardSidebar({ user, role, pendingComplaintCount }: Props) {
   const menuItems: MenuItem[] =
     role === "ADMIN" ? adminMenuItems : technicianMenuItems;
   const pathname = usePathname();
@@ -149,7 +150,15 @@ export default function DashboardSidebar({ user, role }: Props) {
                             }`}
                           >
                             <item.icon className="size-5 shrink-0" />
-                            <span>{item.title}</span>
+                            <span className="flex-1">{item.title}</span>
+                            {(item.url === "/admin/complaints" ||
+                              item.url === "/technician/my-complaints") &&
+                              pendingComplaintCount != null &&
+                              pendingComplaintCount > 0 && (
+                                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                                  {pendingComplaintCount > 99 ? "99+" : pendingComplaintCount}
+                                </span>
+                              )}
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>

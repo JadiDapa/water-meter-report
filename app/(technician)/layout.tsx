@@ -4,15 +4,23 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import DashboardSidebar from "@/components/root/DashboardSidebar";
 import DashboardNavbar from "@/components/root/DashboardNavbar";
 import { getCurrentUser } from "@/app/actions/user.actions";
+import { TechnicianService } from "@/servers/services/technician.service";
+import { ComplaintService } from "@/servers/services/complaint.service";
+
 export default async function TechnicianLayout({ children }: { children: ReactNode }) {
   const user = await getCurrentUser();
 
   if (user.role !== "TECHNICIAN") redirect("/");
 
+  const technician = await TechnicianService.getByUserId(user.id);
+  const pendingComplaintCount = technician
+    ? await ComplaintService.countPendingByTechnicianId(technician.id)
+    : 0;
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <DashboardSidebar user={user} role="TECHNICIAN" />
+        <DashboardSidebar user={user} role="TECHNICIAN" pendingComplaintCount={pendingComplaintCount} />
         <main className="bg-background flex min-w-0 flex-1 flex-col overflow-x-hidden">
           <DashboardNavbar user={user} />
           <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>

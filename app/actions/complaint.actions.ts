@@ -1,10 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { UpdateComplaintSchema } from "@/servers/validators/complaint.validator";
+import {
+  UpdateComplaintSchema,
+  ResolveComplaintSchema,
+  CreateComplaintSchema,
+} from "@/servers/validators/complaint.validator";
 import { ComplaintService } from "@/servers/services/complaint.service";
 import z from "zod";
-import { CreateComplaintSchema } from "@/servers/validators/complaint.validator";
 
 export async function createComplaint(formData: FormData) {
   const data = CreateComplaintSchema.parse({
@@ -42,4 +45,16 @@ export async function deleteComplaint(complaintId: number) {
   await ComplaintService.delete(complaintId);
   revalidatePath("/admin/complaints");
   revalidatePath("/technician/my-complaints");
+}
+
+export async function resolveComplaint(
+  complaintId: number,
+  input: z.input<typeof ResolveComplaintSchema>,
+) {
+  const data = ResolveComplaintSchema.parse(input);
+  await ComplaintService.resolve(complaintId, data);
+  revalidatePath("/admin/complaints");
+  revalidatePath(`/admin/complaints/${complaintId}`);
+  revalidatePath("/technician/my-complaints");
+  revalidatePath(`/technician/my-complaints/${complaintId}`);
 }

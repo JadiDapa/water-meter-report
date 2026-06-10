@@ -27,7 +27,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BuildingType } from "@/servers/validators/building.validator";
+
 type CustomerFormType = z.infer<typeof CreateCustomerSchema>;
+
 export default function CreateCustomerDialog({
   buildings,
 }: {
@@ -38,7 +40,6 @@ export default function CreateCustomerDialog({
   const form = useForm<CustomerFormType>({
     resolver: zodResolver(CreateCustomerSchema),
     defaultValues: {
-      userId: 1,
       customerId: "",
       fullname: "",
       phoneNumber: "",
@@ -46,30 +47,37 @@ export default function CreateCustomerDialog({
       buildingSlug: "",
     },
   });
+
   async function onSubmit(values: CustomerFormType) {
     startTransition(async () => {
       try {
         await createCustomer({ ...values });
-        toast.success("Ticket created!");
+        toast.success("Pelanggan berhasil ditambahkan!");
+        form.reset();
         setOpen(false);
-      } catch {
-        toast.error("Something went wrong");
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Terjadi kesalahan";
+        toast.error(message);
       }
     });
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full cursor-pointer hover:bg-white sm:w-auto">
-          <p className="text-center font-semibold">Tambah Customer</p>
+          <p className="text-center font-semibold">Tambah Pelanggan</p>
           <Plus className="size-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Tambah Customer</DialogTitle>
+          <DialogTitle>Tambah Pelanggan</DialogTitle>
           <p className="text-muted-foreground -mt-1 text-sm">
-            Masukkan data customer
+            Akun akan dibuat dengan username{" "}
+            <span className="font-mono">p_[nomor telepon]</span> dan password =
+            ID pelanggan.
           </p>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
@@ -78,12 +86,17 @@ export default function CreateCustomerDialog({
               <Controller
                 name="fullname"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>Name</FieldLabel>
+                    <FieldLabel>Nama Lengkap</FieldLabel>
                     <InputGroup>
-                      <InputGroupInput {...field} placeholder="Nama Bagian" />
+                      <InputGroupInput {...field} placeholder="Nama lengkap" />
                     </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
                   </Field>
                 )}
               />
@@ -92,12 +105,20 @@ export default function CreateCustomerDialog({
               <Controller
                 name="customerId"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>Customer ID</FieldLabel>
+                    <FieldLabel>ID Pelanggan</FieldLabel>
                     <InputGroup>
-                      <InputGroupInput {...field} placeholder="Nama Bagian" />
+                      <InputGroupInput
+                        {...field}
+                        placeholder="Contoh: CUST-001"
+                      />
                     </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
                   </Field>
                 )}
               />
@@ -106,12 +127,20 @@ export default function CreateCustomerDialog({
               <Controller
                 name="phoneNumber"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>Phone Number</FieldLabel>
+                    <FieldLabel>Nomor Telepon</FieldLabel>
                     <InputGroup>
-                      <InputGroupInput {...field} placeholder="Nomor Telepon" />
+                      <InputGroupInput
+                        {...field}
+                        placeholder="Contoh: 08123456789"
+                      />
                     </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
                   </Field>
                 )}
               />
@@ -120,12 +149,17 @@ export default function CreateCustomerDialog({
               <Controller
                 name="address"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>Address</FieldLabel>
+                    <FieldLabel>Alamat</FieldLabel>
                     <InputGroup>
-                      <InputGroupInput {...field} placeholder="Alamat" />
+                      <InputGroupInput {...field} placeholder="Alamat lengkap" />
                     </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
                   </Field>
                 )}
               />
@@ -134,12 +168,12 @@ export default function CreateCustomerDialog({
             <Controller
               name="buildingSlug"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <Field>
-                  <FieldLabel>Building</FieldLabel>
+                  <FieldLabel>Bangunan</FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={"Pilih Building..."} />
+                      <SelectValue placeholder="Pilih bangunan..." />
                     </SelectTrigger>
                     <SelectContent>
                       {buildings.map((b) => (
@@ -149,6 +183,11 @@ export default function CreateCustomerDialog({
                       ))}
                     </SelectContent>
                   </Select>
+                  {fieldState.error && (
+                    <p className="text-destructive text-xs">
+                      {fieldState.error.message}
+                    </p>
+                  )}
                 </Field>
               )}
             />

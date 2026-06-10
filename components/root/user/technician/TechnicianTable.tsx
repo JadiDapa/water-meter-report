@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { Eye } from "lucide-react";
 import DataTable from "../../DataTable";
 import SearchDataTable from "../../SearchDataTable";
 import { TechnicianType } from "@/servers/validators/technician.validator";
@@ -55,7 +56,7 @@ export const createTechnicianColumns = (
     id: "index",
     header: ({ column }) => <TableSorter isFirst column={column} header="#" />,
     cell: ({ row }) => (
-      <div className="text-muted-foreground max-w-fit ps-5 text-center text-xs">
+      <div className="text-muted-foreground max-w-fit py-2 ps-5 text-center text-xs">
         {row.index + 1}
       </div>
     ),
@@ -126,27 +127,32 @@ export const createTechnicianColumns = (
     header: ({ column }) => <TableSorter column={column} header="CREATED" />,
     cell: ({ row }) => {
       const date = new Date(row.original.createdAt);
-
       return (
         <div className="flex flex-col text-sm leading-tight">
-          <span>{date.toLocaleDateString()}</span>
+          <span>
+            {date.toLocaleString("id-ID", { month: "long", year: "numeric" })}
+          </span>
           <span className="text-muted-foreground text-xs">
-            {date.toLocaleTimeString()}
+            {date.toLocaleString("id-ID", { day: "2-digit", month: "short" })}
           </span>
         </div>
       );
     },
   },
 
-  ...(showActions
-    ? [
-        {
-          id: "actions",
-          header: () => <span className="text-xs">ACTIONS</span>,
-          cell: ({ row }: { row: { original: TechnicianType } }) => (
-            <TechnicianRowActions technician={row.original} />
-          ),
-        } as ColumnDef<TechnicianType>,
-      ]
-    : []),
+  {
+    id: "actions",
+    header: () => <span className="text-xs">ACTIONS</span>,
+    cell: ({ row }: { row: { original: TechnicianType } }) => (
+      <div className="flex items-center gap-1">
+        <Link
+          href={`${basePath}/${row.original.id}`}
+          className="text-muted-foreground hover:text-foreground inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+        >
+          <Eye className="h-4 w-4" />
+        </Link>
+        {showActions && <TechnicianRowActions technician={row.original} />}
+      </div>
+    ),
+  } as ColumnDef<TechnicianType>,
 ];

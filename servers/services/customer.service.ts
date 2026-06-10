@@ -99,7 +99,7 @@ export const CustomerService = {
     });
   },
 
-  async create(data: CreateCustomerDTO) {
+  async create(data: CreateCustomerDTO & { userId: number }) {
     return prisma.customer.create({ data });
   },
 

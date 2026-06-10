@@ -3,7 +3,8 @@ import DynamicBreadcrumb from "@/components/root/DynamicBreadcrumb";
 import { redirect } from "next/navigation";
 import { ComplaintService } from "@/servers/services/complaint.service";
 import Image from "next/image";
-import { User, Wrench, MapPin, Calendar, ImageIcon } from "lucide-react";
+import { User, Wrench, MapPin, Calendar, ImageIcon, XCircle, CheckCircle, Clock } from "lucide-react";
+import { ComplaintStatus } from "@/generated/prisma";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -53,10 +54,31 @@ function EvidenceGallery({ images }: { images: { url: string }[] }) {
   );
 }
 
+const statusConfig = {
+  [ComplaintStatus.PENDING]: {
+    label: "Menunggu",
+    icon: Clock,
+    className: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
+  },
+  [ComplaintStatus.FINISHED]: {
+    label: "Selesai",
+    icon: CheckCircle,
+    className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800",
+  },
+  [ComplaintStatus.CANCELLED]: {
+    label: "Dibatalkan",
+    icon: XCircle,
+    className: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
+  },
+} as const;
+
 export default async function AdminComplaintDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const complaint = await ComplaintService.getById(Number(id));
   if (!complaint) redirect("/admin/complaints");
+
+  const status = statusConfig[complaint.status];
+  const StatusIcon = status.icon;
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
@@ -65,10 +87,16 @@ export default async function AdminComplaintDetailPage({ params }: { params: Pro
           <DynamicBreadcrumb />
           <PageHeader title="Detail Keluhan" subtitle="Keluhan pelanggan meteran air" />
         </div>
-        <div className="bg-background border-border flex items-center gap-2 rounded-xl border px-4 py-2.5 shadow-sm">
-          <Calendar className="h-4 w-4" />
-          <span className="text-sm text-neutral-500">{formatDate(complaint.createdAt)}</span>
-          <span className="ml-1 rounded-md bg-neutral-100 px-1.5 py-0.5 text-xs font-semibold text-neutral-500 dark:bg-neutral-800">#{complaint.id}</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className={`flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium ${status.className}`}>
+            <StatusIcon className="h-4 w-4" />
+            {status.label}
+          </div>
+          <div className="bg-background border-border flex items-center gap-2 rounded-xl border px-4 py-2.5 shadow-sm">
+            <Calendar className="h-4 w-4" />
+            <span className="text-sm text-neutral-500">{formatDate(complaint.createdAt)}</span>
+            <span className="ml-1 rounded-md bg-neutral-100 px-1.5 py-0.5 text-xs font-semibold text-neutral-500 dark:bg-neutral-800">#{complaint.id}</span>
+          </div>
         </div>
       </div>
 
@@ -99,6 +127,32 @@ export default async function AdminComplaintDetailPage({ params }: { params: Pro
           <p className="text-[15px] font-semibold">{complaint.description}</p>
         </div>
       </div>
+
+      {/* Cancellation reason */}
+      {complaint.status === ComplaintStatus.CANCELLED && complaint.cancellationReason && (
+        <div className="flex items-start gap-4 rounded-xl border border-red-200 bg-red-50 p-5 dark:border-red-800 dark:bg-red-900/20">
+          <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+          <div>
+            <p className="mb-1 text-xs font-medium tracking-widest text-red-700 uppercase dark:text-red-400">
+              Alasan Pembatalan
+            </p>
+            <p className="text-[15px] font-semibold text-red-800 dark:text-red-300">
+              {complaint.cancellationReason}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Resolved at */}
+      {complaint.resolvedAt && (
+        <div className="bg-background border-border flex items-center gap-3 rounded-xl border px-5 py-3">
+          <Calendar className="h-4 w-4 text-neutral-400" />
+          <span className="text-xs text-neutral-500">
+            {complaint.status === ComplaintStatus.FINISHED ? "Diselesaikan" : "Dibatalkan"} pada{" "}
+            <span className="font-semibold">{formatDate(complaint.resolvedAt)}</span>
+          </span>
+        </div>
+      )}
 
       <div className="bg-background border-border space-y-4 rounded-xl border p-5 ring-1 ring-neutral-200 dark:ring-neutral-700">
         <div className="flex items-center gap-2.5">

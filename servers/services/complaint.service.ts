@@ -3,10 +3,9 @@ import { Prisma } from "@/generated/prisma";
 import type {
   CreateComplaintDTO,
   UpdateComplaintDTO,
+  ResolveComplaintDTO,
 } from "../validators/complaint.validator";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import { uploadImage } from "@/lib/cloudinary";
 
 export type ComplaintListOptions = {
   page?: number;
@@ -131,24 +130,12 @@ export const ComplaintService = {
   },
 
   async create(data: CreateComplaintDTO, images: File[] = []) {
-    const uploadDir = path.join(process.cwd(), "uploads", "images");
-    await mkdir(uploadDir, { recursive: true });
-
     const imageRecords: { url: string; filename: string; size: number }[] = [];
 
     for (const file of images) {
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const uniqueFilename = `${randomUUID()}.${ext}`;
-      const filepath = path.join(uploadDir, uniqueFilename);
-
       const buffer = Buffer.from(await file.arrayBuffer());
-      await writeFile(filepath, buffer);
-
-      imageRecords.push({
-        url: `/api/images/${uniqueFilename}`,
-        filename: uniqueFilename,
-        size: file.size,
-      });
+      const { url, publicId } = await uploadImage(buffer, "water-meter/complaints");
+      imageRecords.push({ url, filename: publicId, size: file.size });
     }
 
     const complaint = await prisma.complaint.create({
@@ -180,6 +167,25 @@ export const ComplaintService = {
 
   async update(id: number, data: UpdateComplaintDTO) {
     return prisma.complaint.update({ where: { id }, data });
+  },
+
+  async resolve(id: number, dto: ResolveComplaintDTO) {
+    return prisma.complaint.update({
+      where: { id },
+      data: {
+        status: dto.action,
+        cancellationReason: dto.action === "CANCELLED" ? dto.cancellationReason : null,
+        resolvedAt: new Date(),
+      },
+    });
+  },
+
+  async countPending() {
+    return prisma.complaint.count({ where: { status: "PENDING" } });
+  },
+
+  async countPendingByTechnicianId(technicianId: number) {
+    return prisma.complaint.count({ where: { status: "PENDING", technicianId } });
   },
 
   async delete(id: number) {

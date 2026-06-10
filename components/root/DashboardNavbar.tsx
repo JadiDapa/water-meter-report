@@ -13,7 +13,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 export default function DashboardNavbar({ user }: { user: User }) {
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Mobile: full-width search takes over the navbar
   if (searchOpen) {
     return (
       <nav className="border-border bg-card sticky top-0 z-50 flex items-center gap-3 border-b px-4 py-3">

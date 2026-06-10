@@ -7,6 +7,7 @@ import CustomerStats from "@/components/root/user/customer/CustomerStats";
 import { BuildingCard } from "@/components/root/user/customer/BuildingCard";
 import CustomerTable from "@/components/root/user/customer/CustomerTable";
 import CreateBuildingCard from "@/components/root/user/customer/CreateBuildingCard";
+import ImportCustomerDialog from "@/components/root/user/customer/ImportCustomerDialog";
 
 export default async function AdminCustomersPage() {
   const customers = await CustomerService.getAll();
@@ -14,12 +15,16 @@ export default async function AdminCustomersPage() {
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
-      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
+      <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
         <div className="space-y-2">
           <DynamicBreadcrumb />
-          <PageHeader title="Daftar Pelanggan" subtitle="Kelola semua pelanggan" />
+          <PageHeader
+            title="Daftar Pelanggan"
+            subtitle="Kelola semua pelanggan"
+          />
         </div>
-        <div className="w-full sm:w-auto">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <ImportCustomerDialog />
           <CreateCustomerDialog buildings={buildings} />
         </div>
       </div>

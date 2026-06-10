@@ -17,12 +17,11 @@ export const CustomerSearchSchema = z.object({
 });
 
 const CustomerBaseSchema = z.object({
-  userId: z.number(),
   customerId: z.string().min(1),
   fullname: z.string().min(1),
   phoneNumber: z.string().min(1),
   address: z.string().min(1),
-  buildingSlug: z.string(),
+  buildingSlug: z.string().min(1),
 });
 
 export const CreateCustomerSchema = CustomerBaseSchema.extend({});
