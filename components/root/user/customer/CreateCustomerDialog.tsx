@@ -60,7 +60,7 @@ export default function CreateCustomerDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer hover:bg-white">
+        <Button className="w-full cursor-pointer hover:bg-white sm:w-auto">
           <p className="text-center font-semibold">Tambah Customer</p>
           <Plus className="size-4" />
         </Button>

@@ -77,8 +77,8 @@ export default async function AdminComplaintDetailPage({ params }: { params: Pro
         <InfoCard icon={User} label="Pelanggan" name={complaint.customer.fullname} username={complaint.customer.user.username} />
       </div>
 
-      <div className="flex w-full gap-6">
-        <div className="bg-background border-border flex flex-2 items-start gap-4 rounded-xl border p-5 ring-1">
+      <div className="flex w-full flex-col gap-4 sm:flex-row sm:gap-6">
+        <div className="bg-background border-border flex flex-1 items-start gap-4 rounded-xl border p-5 ring-1 sm:flex-2">
           <div>
             <p className="mb-1 text-xs font-medium tracking-widest uppercase">Judul</p>
             <p className="text-[15px] font-semibold">{complaint.title}</p>

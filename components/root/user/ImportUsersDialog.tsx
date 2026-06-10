@@ -127,7 +127,7 @@ export default function ImportUsersDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" className="cursor-pointer gap-2">
+        <Button variant="outline" className="w-full cursor-pointer gap-2 sm:w-auto">
           <FileSpreadsheet className="size-4" />
           Import Excel / CSV
         </Button>

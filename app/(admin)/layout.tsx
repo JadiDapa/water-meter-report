@@ -13,9 +13,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <DashboardSidebar user={user} role="ADMIN" />
-        <main className="bg-background flex flex-1 flex-col">
+        <main className="bg-background flex min-w-0 flex-1 flex-col overflow-x-hidden">
           <DashboardNavbar user={user} />
-          <div className="flex-1 overflow-auto p-6">{children}</div>
+          <div className="flex-1 overflow-auto p-4 md:p-6">{children}</div>
         </main>
       </div>
     </SidebarProvider>

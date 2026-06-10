@@ -16,13 +16,13 @@ export default async function TechnicianMyReportsPage() {
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
-      <div className="flex flex-col items-center justify-between lg:flex-row">
+      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
         <div className="space-y-2">
           <DynamicBreadcrumb />
           <PageHeader title="Laporan Saya" subtitle="Semua laporan yang Anda buat" />
         </div>
-        <Link href="/technician/my-reports/create">
-          <Button className="flex cursor-pointer items-center gap-2 px-6">
+        <Link href="/technician/my-reports/create" className="w-full sm:w-auto">
+          <Button className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 sm:w-auto">
             <p className="text-lg font-semibold">Tambah Laporan</p>
             <Plus className="size-5" />
           </Button>

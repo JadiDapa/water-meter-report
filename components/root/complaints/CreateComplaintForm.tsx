@@ -129,7 +129,7 @@ export default function CreateComplaintForm({
   }
 
   return (
-    <section className="max-w-lg">
+    <section className="w-full max-w-lg">
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
         <FieldGroup>
           {customers && (

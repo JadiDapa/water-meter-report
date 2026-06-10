@@ -126,9 +126,9 @@ export default function SignInForm() {
         <Button
           type="submit"
           disabled={isPending || !loaded}
-          className="flex h-10 w-full items-center gap-3 text-lg lg:h-12"
+          className="flex h-10 w-full items-center gap-3 rounded-full text-lg lg:h-12"
         >
-          {isPending ? <Spinner /> : "Masuk"}
+          {isPending ? <Spinner /> : "Ayo Masuk!"}
         </Button>
       </FieldGroup>
     </form>

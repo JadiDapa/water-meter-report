@@ -4,7 +4,10 @@
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\" -Force)",
       "Bash(Select-Object Name, PSIsContainer)",
       "Bash(Format-Table -AutoSize)",
-      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\app\\\\\\(root\\)\")"
+      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\app\\\\\\(root\\)\")",
+      "Bash(dir /s /b app/)",
+      "Bash(findstr /E \"layout.tsx|page.tsx\")",
+      "Bash(PowerShell -Command \"Get-ChildItem -Path 'components\\\\root' -Recurse -File | Select-Object FullName\")"
     ]
   }
 }

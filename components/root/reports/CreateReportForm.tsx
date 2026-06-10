@@ -127,7 +127,7 @@ export default function CreateReportDialog({
   }
 
   return (
-    <section className="max-w-lg">
+    <section className="w-full max-w-lg">
       <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
         <FieldGroup>
           {customers && (
@@ -155,7 +155,7 @@ export default function CreateReportDialog({
           )}
 
           {/* Location + Values */}
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
             <Controller
               name="location"
               control={form.control}

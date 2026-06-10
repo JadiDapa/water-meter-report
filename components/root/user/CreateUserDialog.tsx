@@ -59,7 +59,7 @@ export default function CreateUserDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="cursor-pointer">
+        <Button className="w-full cursor-pointer sm:w-auto">
           <p className="text-center font-semibold">Tambah User</p>
           <Plus className="size-4" />
         </Button>

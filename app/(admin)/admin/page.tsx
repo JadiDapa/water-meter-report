@@ -109,7 +109,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <main className="min-h-screen w-full space-y-8">
-      <div className="flex flex-col items-center justify-between lg:flex-row">
+      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
         <PageHeader
           title={`Selamat Datang, ${user.name}!`}
           subtitle="Pantau semua laporan, keluhan, dan pengguna dari sini."

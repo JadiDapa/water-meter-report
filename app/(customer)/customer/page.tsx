@@ -39,7 +39,7 @@ export default async function CustomerHomePage() {
         subtitle={`ID Pelanggan: ${customerProfile.customerId} · ${customerProfile.building?.name ?? customerProfile.buildingSlug}`}
       />
 
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
         <WaterUsageChart reports={reports} />
         <UsageStats reports={reports} />
       </div>
@@ -49,7 +49,7 @@ export default async function CustomerHomePage() {
         {reports.length === 0 ? (
           <p className="text-muted-foreground text-sm">Belum ada laporan.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {reports.map((report) => (
               <Link key={report.id} href={`/customer/reports/${report.id}`}>
                 <ReportCard report={report} />
@@ -64,7 +64,7 @@ export default async function CustomerHomePage() {
         {complaints.length === 0 ? (
           <p className="text-muted-foreground text-sm">Belum ada keluhan.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {complaints.map((complaint) => (
               <Link
                 key={complaint.id}

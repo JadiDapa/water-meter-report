@@ -21,7 +21,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen w-full space-y-8 md:rounded-2xl">
-      <div className="flex flex-col items-center justify-between lg:flex-row">
+      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
         <div className="space-y-2">
           <DynamicBreadcrumb />
           <PageHeader
@@ -31,14 +31,14 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col gap-6 lg:flex-row">
         <WaterUsageChart reports={reports} />
         <UsageStats reports={reports} />
       </div>
 
       <div>
         <h2 className="mb-4 text-lg font-semibold">Laporan Terbaru</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {reports.map((report) => (
             <Link key={report.id} href={`/admin/reports/${report.id}`}>
               <ReportCard report={report} />
@@ -49,7 +49,7 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
 
       <div>
         <h2 className="mb-4 text-lg font-semibold">Keluhan Terbaru</h2>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {complaints.map((complaint) => (
             <Link key={complaint.id} href={`/admin/complaints/${complaint.id}`}>
               <ComplaintCard complaint={complaint} />

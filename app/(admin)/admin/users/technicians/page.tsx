@@ -10,12 +10,14 @@ export default async function AdminTechniciansPage() {
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
-      <div className="flex flex-col items-center justify-between lg:flex-row">
+      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
         <div className="space-y-2">
           <DynamicBreadcrumb />
           <PageHeader title="Daftar Teknisi" subtitle="Kelola semua teknisi" />
         </div>
-        <CreateTechnicianDialog />
+        <div className="w-full sm:w-auto">
+          <CreateTechnicianDialog />
+        </div>
       </div>
 
       <TechnicianStats />

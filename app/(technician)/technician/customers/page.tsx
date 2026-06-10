@@ -12,7 +12,7 @@ export default async function TechnicianCustomersPage() {
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
-      <div className="flex flex-col items-center justify-between lg:flex-row">
+      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
         <div className="space-y-2">
           <DynamicBreadcrumb />
           <PageHeader title="Daftar Pelanggan" subtitle="Lihat semua pelanggan" />
@@ -25,7 +25,7 @@ export default async function TechnicianCustomersPage() {
         <h2 className="text-foreground text-xl font-medium tracking-tight">
           Kategori Bangunan
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-7">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {buildings.map((building) => (
             <BuildingCard
               key={building.id}

@@ -59,7 +59,7 @@ export default function WaterUsageChart({ reports }: WaterUsageChartProps) {
   return (
     <Tabs
       defaultValue="bar"
-      className="bg-card w-full flex-2 flex-col gap-6 p-2"
+      className="bg-card w-full flex-col gap-6 p-2 lg:flex-2"
     >
       <TabsContent value="bar">
         <Card>
