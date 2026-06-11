@@ -28,6 +28,7 @@ export default function CreateTechnicianDialog() {
   const form = useForm<TechnicianFormType>({
     resolver: zodResolver(CreateTechnicianSchema),
     defaultValues: {
+      username: "",
       technicianId: "",
       fullname: "",
       phoneNumber: "",
@@ -62,13 +63,30 @@ export default function CreateTechnicianDialog() {
         <DialogHeader>
           <DialogTitle>Tambah Teknisi</DialogTitle>
           <p className="text-muted-foreground -mt-1 text-sm">
-            Akun akan dibuat dengan username{" "}
-            <span className="font-mono">t_[nomor telepon]</span> dan password =
-            ID teknisi.
+            Password akun akan diisi dengan ID teknisi.
           </p>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
           <FieldGroup>
+            <div className="flex gap-4">
+              <Controller
+                name="username"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Username</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput {...field} placeholder="Username" />
+                    </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
             <div className="flex gap-4">
               <Controller
                 name="fullname"

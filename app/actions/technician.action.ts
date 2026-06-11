@@ -15,11 +15,9 @@ export async function createTechnician(
 ) {
   const data = CreateTechnicianSchema.parse(input);
 
-  const clerkUsername = `t_${data.phoneNumber}`;
-
   const clerk = await clerkClient();
   const clerkUser = await clerk.users.createUser({
-    username: clerkUsername,
+    username: data.username,
     password: data.technicianId,
     firstName: data.fullname,
   });
@@ -28,13 +26,19 @@ export async function createTechnician(
 
   try {
     const dbUser = await UserService.create({
-      username: clerkUsername,
+      username: data.username,
       role: "TECHNICIAN",
       name: data.fullname,
     });
     dbUserId = dbUser.id;
 
-    await TechnicianService.create({ ...data, userId: dbUser.id });
+    await TechnicianService.create({
+      technicianId: data.technicianId,
+      fullname: data.fullname,
+      phoneNumber: data.phoneNumber,
+      region: data.region,
+      userId: dbUser.id,
+    });
   } catch (err) {
     await clerk.users.deleteUser(clerkUser.id).catch(() => {});
     if (dbUserId) {

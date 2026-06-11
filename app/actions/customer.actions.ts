@@ -32,7 +32,14 @@ export async function createCustomer(
     });
     dbUserId = dbUser.id;
 
-    await CustomerService.create({ ...data, userId: dbUser.id });
+    await CustomerService.create({
+      customerId: data.customerId,
+      fullname: data.fullname,
+      phoneNumber: data.phoneNumber,
+      address: data.address,
+      buildingSlug: data.buildingSlug,
+      userId: dbUser.id,
+    });
   } catch (err) {
     await clerk.users.deleteUser(clerkUser.id).catch(() => {});
     if (dbUserId) {
@@ -116,7 +123,14 @@ export async function importCustomers(
       });
       dbUserId = dbUser.id;
 
-      await CustomerService.create({ ...data, userId: dbUser.id });
+      await CustomerService.create({
+        customerId: data.customerId,
+        fullname: data.fullname,
+        phoneNumber: data.phoneNumber,
+        address: data.address,
+        buildingSlug: data.buildingSlug,
+        userId: dbUser.id,
+      });
 
       result.success++;
     } catch (error) {
