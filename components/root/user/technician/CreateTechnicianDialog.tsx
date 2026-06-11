@@ -19,43 +19,52 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { CreateTechnicianSchema } from "@/servers/validators/technician.validator";
 import { createTechnician } from "@/app/actions/technician.action";
+
 type TechnicianFormType = z.infer<typeof CreateTechnicianSchema>;
+
 export default function CreateTechnicianDialog() {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const form = useForm<TechnicianFormType>({
     resolver: zodResolver(CreateTechnicianSchema),
     defaultValues: {
-      userId: 1,
+      technicianId: "",
       fullname: "",
       phoneNumber: "",
       region: "",
     },
   });
+
   async function onSubmit(values: TechnicianFormType) {
     startTransition(async () => {
       try {
         await createTechnician({ ...values });
-        toast.success("Ticket created!");
+        toast.success("Teknisi berhasil ditambahkan!");
+        form.reset();
         setOpen(false);
-      } catch {
-        toast.error("Something went wrong");
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Terjadi kesalahan";
+        toast.error(message);
       }
     });
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full cursor-pointer hover:bg-white sm:w-auto">
-          <p className="text-center font-semibold">Tambah Technician</p>
+          <p className="text-center font-semibold">Tambah Teknisi</p>
           <Plus className="size-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Tambah Technician</DialogTitle>
+          <DialogTitle>Tambah Teknisi</DialogTitle>
           <p className="text-muted-foreground -mt-1 text-sm">
-            Masukkan data technician
+            Akun akan dibuat dengan username{" "}
+            <span className="font-mono">t_[nomor telepon]</span> dan password =
+            ID teknisi.
           </p>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
@@ -64,32 +73,87 @@ export default function CreateTechnicianDialog() {
               <Controller
                 name="fullname"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>Name</FieldLabel>
+                    <FieldLabel>Nama Lengkap</FieldLabel>
                     <InputGroup>
-                      <InputGroupInput {...field} placeholder="Nama Bagian" />
+                      <InputGroupInput {...field} placeholder="Nama lengkap" />
                     </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
                   </Field>
                 )}
               />
             </div>
-
+            <div className="flex gap-4">
+              <Controller
+                name="technicianId"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>ID Teknisi</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        {...field}
+                        placeholder="Contoh: TEK-001"
+                      />
+                    </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
             <div className="flex gap-4">
               <Controller
                 name="phoneNumber"
                 control={form.control}
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <Field>
-                    <FieldLabel>Phone Number</FieldLabel>
+                    <FieldLabel>Nomor Telepon</FieldLabel>
                     <InputGroup>
-                      <InputGroupInput {...field} placeholder="Nomor Telepon" />
+                      <InputGroupInput
+                        {...field}
+                        placeholder="Contoh: 08123456789"
+                      />
                     </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
                   </Field>
                 )}
               />
             </div>
-
+            <div className="flex gap-4">
+              <Controller
+                name="region"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Wilayah</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        {...field}
+                        placeholder="Contoh: Jakarta Selatan"
+                      />
+                    </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
             <DialogFooter className="mt-6">
               <Button
                 type="button"

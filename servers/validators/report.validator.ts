@@ -30,7 +30,9 @@ const ReportBaseSchema = z.object({
   values: z.coerce.string(),
 });
 
-export const CreateReportSchema = ReportBaseSchema.extend({});
+export const CreateReportSchema = ReportBaseSchema.extend({
+  createdAt: z.coerce.date(),
+});
 
 export const UpdateReportSchema = ReportBaseSchema.partial();
 

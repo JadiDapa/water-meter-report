@@ -40,6 +40,7 @@ export default function CreateCustomerDialog({
   const form = useForm<CustomerFormType>({
     resolver: zodResolver(CreateCustomerSchema),
     defaultValues: {
+      username: "",
       customerId: "",
       fullname: "",
       phoneNumber: "",
@@ -75,13 +76,31 @@ export default function CreateCustomerDialog({
         <DialogHeader>
           <DialogTitle>Tambah Pelanggan</DialogTitle>
           <p className="text-muted-foreground -mt-1 text-sm">
-            Akun akan dibuat dengan username{" "}
-            <span className="font-mono">p_[nomor telepon]</span> dan password =
-            ID pelanggan.
+            Akun akan dibuat dengan username yang diisi dan password = ID
+            pelanggan.
           </p>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
           <FieldGroup>
+            <div className="flex gap-4">
+              <Controller
+                name="username"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Username</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput {...field} placeholder="Username akun" />
+                    </InputGroup>
+                    {fieldState.error && (
+                      <p className="text-destructive text-xs">
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
             <div className="flex gap-4">
               <Controller
                 name="fullname"

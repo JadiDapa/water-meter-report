@@ -129,9 +129,9 @@ export const ReportService = {
   },
 
   async create(data: CreateReportDTO, images: File[] = []) {
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const ref = data.createdAt;
+    const monthStart = new Date(ref.getFullYear(), ref.getMonth(), 1);
+    const monthEnd = new Date(ref.getFullYear(), ref.getMonth() + 1, 1);
 
     const existing = await prisma.report.findFirst({
       where: {
@@ -141,7 +141,7 @@ export const ReportService = {
     });
 
     if (existing) {
-      const label = now.toLocaleString("id-ID", {
+      const label = ref.toLocaleString("id-ID", {
         month: "long",
         year: "numeric",
       });

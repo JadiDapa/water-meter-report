@@ -15,12 +15,9 @@ export async function createCustomer(
 ) {
   const data = CreateCustomerSchema.parse(input);
 
-  // Clerk usernames must contain at least one non-numeric character
-  const clerkUsername = `p_${data.phoneNumber}`;
-
   const clerk = await clerkClient();
   const clerkUser = await clerk.users.createUser({
-    username: clerkUsername,
+    username: data.username,
     password: data.customerId,
     firstName: data.fullname,
   });
@@ -29,7 +26,7 @@ export async function createCustomer(
 
   try {
     const dbUser = await UserService.create({
-      username: clerkUsername,
+      username: data.username,
       role: "CUSTOMER",
       name: data.fullname,
     });
@@ -71,6 +68,7 @@ export async function deleteCustomer(customerId: number) {
 // ── Import types ──────────────────────────────────────────────────────────────
 
 export type ImportCustomerRow = {
+  username: string;
   customerId: string;
   fullname: string;
   phoneNumber: string;
@@ -95,6 +93,7 @@ export async function importCustomers(
 
     try {
       const data = CreateCustomerSchema.parse({
+        username: row.username,
         customerId: row.customerId,
         fullname: row.fullname,
         phoneNumber: row.phoneNumber,
@@ -102,18 +101,16 @@ export async function importCustomers(
         buildingSlug: row.buildingSlug,
       });
 
-      const clerkUsername = `p_${data.phoneNumber}`;
-
       const clerk = await clerkClient();
       const clerkUser = await clerk.users.createUser({
-        username: clerkUsername,
+        username: data.username,
         password: data.customerId,
         firstName: data.fullname,
       });
       clerkUserId = clerkUser.id;
 
       const dbUser = await UserService.create({
-        username: clerkUsername,
+        username: data.username,
         role: "CUSTOMER",
         name: data.fullname,
       });

@@ -24,6 +24,7 @@ import {
 } from "@/app/actions/customer.actions";
 
 const EXPECTED_COLS = [
+  "username",
   "customerId",
   "fullname",
   "phoneNumber",
@@ -32,6 +33,7 @@ const EXPECTED_COLS = [
 ];
 
 const COL_LABELS: Record<string, string> = {
+  username: "Username",
   customerId: "ID Pelanggan",
   fullname: "Nama Lengkap",
   phoneNumber: "No. Telepon",
@@ -75,6 +77,7 @@ export default function ImportCustomerDialog() {
         }
 
         const parsed: ImportCustomerRow[] = json.map((r) => ({
+          username: String(r["username"] ?? "").trim(),
           customerId: String(r["customerId"] ?? "").trim(),
           fullname: String(r["fullname"] ?? "").trim(),
           phoneNumber: String(r["phoneNumber"] ?? "").trim(),
@@ -159,10 +162,9 @@ export default function ImportCustomerDialog() {
             . Kolom{" "}
             <span className="text-foreground font-mono">buildingSlug</span>{" "}
             diisi dengan slug bangunan (contoh:{" "}
-            <span className="text-foreground font-mono">gedung-a</span>).
-            Username akun ={" "}
-            <span className="text-foreground font-mono">p_[nomor telepon]</span>
-            , password = ID pelanggan.
+            <span className="text-foreground font-mono">gedung-a</span>). Kolom{" "}
+            <span className="text-foreground font-mono">username</span> digunakan
+            sebagai username akun, password = ID pelanggan.
           </p>
 
           {/* Drop zone */}
@@ -215,6 +217,7 @@ export default function ImportCustomerDialog() {
                   <tbody>
                     {rows.slice(0, 5).map((r, i) => (
                       <tr key={i} className="border-border/40 border-t">
+                        <td className="px-3 py-1.5">{r.username}</td>
                         <td className="px-3 py-1.5">{r.customerId}</td>
                         <td className="px-3 py-1.5">{r.fullname}</td>
                         <td className="px-3 py-1.5">{r.phoneNumber}</td>
@@ -225,7 +228,7 @@ export default function ImportCustomerDialog() {
                     {rows.length > 5 && (
                       <tr className="border-border/40 border-t">
                         <td
-                          colSpan={5}
+                          colSpan={6}
                           className="text-muted-foreground px-3 py-1.5 text-center"
                         >
                           +{rows.length - 5} baris lagi

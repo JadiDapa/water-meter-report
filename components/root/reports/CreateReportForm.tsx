@@ -23,9 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Customer } from "@/generated/prisma";
 import { useRouter } from "next/navigation";
-import { X, ImagePlus, UploadCloud } from "lucide-react";
+import { X, ImagePlus, UploadCloud, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 type ReportFormType = z.infer<typeof CreateReportSchema>;
 
@@ -56,6 +61,7 @@ export default function CreateReportDialog({
       customerId: customerId ? customerId : undefined,
       location: "",
       values: "",
+      createdAt: new Date(),
     },
   });
 
@@ -114,6 +120,7 @@ export default function CreateReportDialog({
         formData.append("customerId", String(values.customerId));
         formData.append("location", values.location);
         formData.append("values", values.values);
+        formData.append("createdAt", values.createdAt.toISOString());
 
         // Append image files
         images.forEach((img) => formData.append("images", img.file));
@@ -159,6 +166,41 @@ export default function CreateReportDialog({
               )}
             />
           )}
+
+          {/* Date */}
+          <Controller
+            name="createdAt"
+            control={form.control}
+            render={({ field }) => (
+              <Field>
+                <FieldLabel>Tanggal Laporan</FieldLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !field.value && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {field.value
+                        ? format(field.value, "dd MMMM yyyy", { locale: id })
+                        : "Pilih tanggal"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => field.onChange(date ?? new Date())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </Field>
+            )}
+          />
 
           {/* Location + Values */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">

@@ -1,12 +1,13 @@
 model Technician {
-  id          Int         @id @default(autoincrement())
-  userId      Int         @unique
-  user        User        @relation(fields: [userId], references: [id])
-  fullname    String
-  phoneNumber String
-  region      String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  reports     Report[]
-  complaints  Complaint[]
+  id           Int         @id @default(autoincrement())
+  userId       Int         @unique
+  user         User        @relation(fields: [userId], references: [id])
+  technicianId String      @unique
+  fullname     String
+  phoneNumber  String
+  region       String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  reports      Report[]
+  complaints   Complaint[]
 }

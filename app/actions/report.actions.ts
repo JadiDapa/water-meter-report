@@ -14,6 +14,7 @@ export async function createReport(formData: FormData) {
     customerId: formData.get("customerId"),
     location: formData.get("location"),
     values: formData.get("values"),
+    createdAt: formData.get("createdAt"),
   });
 
   const images = formData

@@ -15,7 +15,7 @@ export const TechnicianSearchSchema = z.object({
 });
 
 const TechnicianBaseSchema = z.object({
-  userId: z.number(),
+  technicianId: z.string().min(1),
   fullname: z.string().min(1),
   phoneNumber: z.string().min(1),
   region: z.string().min(1),

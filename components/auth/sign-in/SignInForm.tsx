@@ -28,7 +28,7 @@ export default function SignInForm() {
   const [isVisible, setIsVisible] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { signIn } = useSignIn();
-  const { setActive, loaded } = useClerk();
+  const { loaded } = useClerk();
   const router = useRouter();
 
   const form = useForm<LoginFormType>({
@@ -41,28 +41,31 @@ export default function SignInForm() {
       if (!loaded) return;
 
       try {
+        const identifier = /^\d+$/.test(values.username)
+          ? `p${values.username}`
+          : values.username;
+
         const { error } = await signIn.password({
-          identifier: values.username, // atau emailAddress kalau pakai email
+          identifier,
           password: values.password,
         });
 
         if (error) {
-          toast.error("Kombinasi salah");
+          toast.error("Kombinasi username dan password salah");
           console.error(error);
           return;
         }
 
         if (signIn.status === "complete") {
           await signIn.finalize({
-            navigate: ({ session, decorateUrl }) => {
-              const url = decorateUrl("/");
-              router.push(url);
+            navigate: ({ decorateUrl }) => {
+              router.push(decorateUrl("/"));
             },
           });
         }
       } catch (err) {
         console.error(err);
-        toast.error("Login gagal");
+        toast.error("Login gagal, coba lagi");
       }
     });
   }

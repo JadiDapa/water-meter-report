@@ -70,7 +70,7 @@ export const TechnicianService = {
     });
   },
 
-  async create(data: CreateTechnicianDTO) {
+  async create(data: CreateTechnicianDTO & { userId: number }) {
     return prisma.technician.create({ data });
   },
 
