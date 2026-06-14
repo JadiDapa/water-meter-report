@@ -29,7 +29,7 @@ export default function CustomerTable({
       columns={columns}
       data={customers}
       filters={(table) => (
-        <div className="grid w-full items-end gap-4 p-4 lg:grid-cols-3 lg:gap-6">
+        <div className="grid w-full items-end gap-4 p-4 lg:grid-cols-4 lg:gap-6">
           <SearchDataTable
             table={table}
             column="customer"

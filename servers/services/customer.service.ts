@@ -77,6 +77,19 @@ export const CustomerService = {
     });
   },
 
+  async getAllWithLatestReport() {
+    return await prisma.customer.findMany({
+      orderBy: { fullname: "asc" },
+      include: {
+        reports: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { values: true, createdAt: true },
+        },
+      },
+    });
+  },
+
   async getByBuildingSlug(buildingSlug: string) {
     return await prisma.customer.findMany({
       where: { buildingSlug },
@@ -95,6 +108,7 @@ export const CustomerService = {
         reports: true,
         complaints: true,
         bulding: true,
+        user: true,
       },
     });
   },

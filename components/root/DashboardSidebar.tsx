@@ -24,9 +24,9 @@ import {
   PanelRightOpen,
   LogOut,
   ChevronsUpDown,
-  Droplet,
   ChevronRight,
 } from "lucide-react";
+import Image from "next/image";
 import { Separator } from "../ui/separator";
 import {
   Collapsible,
@@ -60,7 +60,13 @@ export default function DashboardSidebar({ user, role, pendingComplaintCount }: 
           {/* Header */}
           <div className="flex h-18.25 items-center justify-between border-b px-4 py-4">
             <div className="flex items-center gap-2">
-              <Droplet className="text-primary size-8" />
+              <Image
+                src="https://fornews.co/news/inline/2021/02/Logo-PDAM-Tirta-Musi.png"
+                alt="Tirta Musi"
+                width={32}
+                height={32}
+                className="size-8 shrink-0 object-contain"
+              />
               <div className="">
                 <p className="text-foreground text-xl font-bold tracking-tight">
                   Tirta Musi

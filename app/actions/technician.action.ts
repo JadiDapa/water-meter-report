@@ -9,6 +9,7 @@ import { TechnicianService } from "@/servers/services/technician.service";
 import { UserService } from "@/servers/services/user.service";
 import { clerkClient } from "@clerk/nextjs/server";
 import z from "zod";
+import { Prisma } from "@/generated/prisma";
 
 export async function createTechnician(
   input: z.input<typeof CreateTechnicianSchema>,
@@ -43,6 +44,12 @@ export async function createTechnician(
     await clerk.users.deleteUser(clerkUser.id).catch(() => {});
     if (dbUserId) {
       await UserService.delete(dbUserId).catch(() => {});
+    }
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
+      throw new Error("ID Teknisi atau username sudah digunakan.");
     }
     throw err;
   }

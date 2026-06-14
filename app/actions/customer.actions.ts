@@ -9,6 +9,7 @@ import { CustomerService } from "@/servers/services/customer.service";
 import { UserService } from "@/servers/services/user.service";
 import z from "zod";
 import { clerkClient } from "@clerk/nextjs/server";
+import { Prisma } from "@/generated/prisma";
 
 export async function createCustomer(
   input: z.input<typeof CreateCustomerSchema>,
@@ -44,6 +45,12 @@ export async function createCustomer(
     await clerk.users.deleteUser(clerkUser.id).catch(() => {});
     if (dbUserId) {
       await UserService.delete(dbUserId).catch(() => {});
+    }
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
+      throw new Error("ID Pelanggan atau username sudah digunakan.");
     }
     throw err;
   }

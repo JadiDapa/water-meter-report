@@ -3,9 +3,24 @@ import { ComplaintService } from "@/servers/services/complaint.service";
 import DynamicBreadcrumb from "@/components/root/DynamicBreadcrumb";
 import ComplaintStats from "@/components/root/complaints/ComplaintStats";
 import ComplaintTable from "@/components/root/complaints/ComplaintTable";
+import MonthYearFilter from "@/components/root/MonthYearFilter";
+import {
+  parseMonthYear,
+  filterByMonthYear,
+  getAvailableYears,
+} from "@/lib/format";
 
-export default async function AdminComplaintsPage() {
-  const complaints = await ComplaintService.getAll();
+export default async function AdminComplaintsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}) {
+  const params = await searchParams;
+  const { month, year } = parseMonthYear(params.month, params.year);
+
+  const allComplaints = await ComplaintService.getAll();
+  const years = getAvailableYears(allComplaints);
+  const complaints = filterByMonthYear(allComplaints, { month, year });
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
@@ -14,6 +29,7 @@ export default async function AdminComplaintsPage() {
           <DynamicBreadcrumb />
           <PageHeader title="Daftar Keluhan" subtitle="Semua keluhan pelanggan" />
         </div>
+        <MonthYearFilter month={month} year={year} years={years} />
       </div>
 
       <ComplaintStats complaints={complaints} />

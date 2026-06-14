@@ -23,7 +23,10 @@
       "PowerShell(Get-Process -Name \"node\" -ErrorAction SilentlyContinue)",
       "PowerShell(Get-CimInstance Win32_Process -Filter \"Name='node.exe'\")",
       "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\Users\\\\daffa\\\\Documents\\\\Codes\\\\Projects\\\\water-meter-report\\\\prisma\\\\migrations\\\\20260611000000_add_technician_id\" -Force)",
-      "Bash(node -e \"require\\('date-fns'\\)\")"
+      "Bash(node -e \"require\\('date-fns'\\)\")",
+      "PowerShell(npx tsc --noEmit)",
+      "Bash(npx tsc *)",
+      "PowerShell(npx tsc --noEmit 2>&1)"
     ]
   }
 }

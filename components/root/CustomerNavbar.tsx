@@ -4,7 +4,8 @@ import { User } from "@/generated/prisma";
 import { ToggleTheme } from "./ToggleTheme";
 import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { Droplet, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
+import Image from "next/image";
 
 export default function CustomerNavbar({ user }: { user: User }) {
   const { signOut } = useClerk();
@@ -20,7 +21,13 @@ export default function CustomerNavbar({ user }: { user: User }) {
       <div className="mx-auto flex max-w-5xl items-center justify-between">
         {/* Brand */}
         <div className="flex items-center gap-2">
-          <Droplet className="text-primary size-6 shrink-0" />
+          <Image
+            src="https://fornews.co/news/inline/2021/02/Logo-PDAM-Tirta-Musi.png"
+            alt="Tirta Musi"
+            width={24}
+            height={24}
+            className="size-6 shrink-0 object-contain"
+          />
           <span className="text-foreground text-lg font-bold tracking-tight">
             Tirta Musi
           </span>

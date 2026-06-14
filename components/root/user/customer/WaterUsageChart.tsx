@@ -6,6 +6,7 @@ import {
   CartesianGrid,
   LabelList,
   XAxis,
+  YAxis,
   Area,
   AreaChart,
 } from "recharts";
@@ -21,7 +22,7 @@ import {
 } from "@/components/ui/chart";
 
 const barConfig = {
-  values: {
+  diff: {
     label: "Usage (m³)",
     color: "var(--chart-1)",
   },
@@ -56,9 +57,15 @@ export default function WaterUsageChart({ reports }: WaterUsageChartProps) {
   const chartData = sorted.map((report, i) => {
     const current = Number(report.values);
     const previous = i > 0 ? Number(sorted[i - 1].values) : 0;
+    const month = new Date(report.createdAt).toLocaleString("id-ID", {
+      month: "short",
+    });
     return {
-      month: new Date(report.createdAt).toLocaleString("id-ID", { month: "short" }),
-      values: current - previous,
+      month,
+      // Selisih Bulanan: monthly difference between consecutive readings
+      diff: current - previous,
+      // Penggunaan Progresif: the actual recorded meter value each month
+      values: current,
     };
   });
 
@@ -67,39 +74,6 @@ export default function WaterUsageChart({ reports }: WaterUsageChartProps) {
       defaultValue="bar"
       className="bg-card w-full flex-col gap-6 p-2 lg:flex-2"
     >
-      <TabsContent value="bar">
-        <Card>
-          <CardHeader>
-            <CardTitle>Water usage</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer className="h-64" config={barConfig}>
-              <BarChart data={chartData} margin={{ top: 20 }}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="month"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Bar dataKey="values" fill="var(--color-values)" radius={8}>
-                  <LabelList
-                    position="top"
-                    offset={12}
-                    className="fill-foreground"
-                    fontSize={12}
-                  />
-                </Bar>
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
       <TabsContent value="area">
         <Card>
           <CardHeader>
@@ -114,6 +88,12 @@ export default function WaterUsageChart({ reports }: WaterUsageChartProps) {
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  width={48}
                 />
                 <ChartTooltip
                   cursor={false}
@@ -132,10 +112,48 @@ export default function WaterUsageChart({ reports }: WaterUsageChartProps) {
           </CardContent>
         </Card>
       </TabsContent>
+      <TabsContent value="bar">
+        <Card>
+          <CardHeader>
+            <CardTitle>Water usage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer className="h-64" config={barConfig}>
+              <BarChart data={chartData} margin={{ top: 20 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  width={48}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar dataKey="diff" fill="var(--color-diff)" radius={8}>
+                  <LabelList
+                    position="top"
+                    offset={12}
+                    className="fill-foreground"
+                    fontSize={12}
+                  />
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </TabsContent>
 
       <TabsList className="w-full rounded-lg p-2">
-        <TabsTrigger value="bar">Penggunaan Progresif</TabsTrigger>
-        <TabsTrigger value="area">Selisih Bulanan</TabsTrigger>
+        <TabsTrigger value="area">Penggunaan Progresif</TabsTrigger>
+        <TabsTrigger value="bar">Selisih Bulanan</TabsTrigger>
       </TabsList>
     </Tabs>
   );

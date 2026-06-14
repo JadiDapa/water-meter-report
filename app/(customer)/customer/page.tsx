@@ -7,6 +7,7 @@ import UsageStats from "@/components/root/user/customer/UsageStats";
 import ReportCard from "@/components/root/user/customer/reports/ReportCard";
 import ComplaintCard from "@/components/root/user/customer/complaints/ComplaintCard";
 import PendingComplaintBanner from "@/components/root/user/customer/complaints/PendingComplaintBanner";
+import CustomerHeaderCard from "@/components/root/user/customer/CustomerHeaderCard";
 import PageHeader from "@/components/root/PageHeader";
 import Link from "next/link";
 import { ComplaintStatus } from "@/generated/prisma";
@@ -31,6 +32,8 @@ export default async function CustomerHomePage() {
     );
   }
 
+  const customer = await CustomerService.getById(customerProfile.id);
+
   const rawReports = await ReportService.getByCustomerId(customerProfile.id);
   const reports = [...rawReports].sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -52,10 +55,14 @@ export default async function CustomerHomePage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader
-        title={`Halo, ${user.name}!`}
-        subtitle={`ID Pelanggan: ${customerProfile.customerId} · ${customerProfile.buildingSlug}`}
-      />
+      {customer ? (
+        <CustomerHeaderCard customer={customer} />
+      ) : (
+        <PageHeader
+          title={`Halo, ${user.name}!`}
+          subtitle={`ID Pelanggan: ${customerProfile.customerId} · ${customerProfile.buildingSlug}`}
+        />
+      )}
 
       <div className="flex flex-col gap-6 lg:flex-row">
         <WaterUsageChart reports={reports} />
@@ -72,7 +79,9 @@ export default async function CustomerHomePage() {
               <Link key={report.id} href={`/customer/reports/${report.id}`}>
                 <ReportCard
                   report={report}
-                  previousValue={i > 0 ? Number(reports[i - 1].values) : undefined}
+                  previousValue={
+                    i > 0 ? Number(reports[i - 1].values) : undefined
+                  }
                 />
               </Link>
             ))}

@@ -1,7 +1,7 @@
 import ComplaintCard from "@/components/root/user/customer/complaints/ComplaintCard";
 import ReportCard from "@/components/root/user/customer/reports/ReportCard";
 import DynamicBreadcrumb from "@/components/root/DynamicBreadcrumb";
-import PageHeader from "@/components/root/PageHeader";
+import CustomerHeaderCard from "@/components/root/user/customer/CustomerHeaderCard";
 import { ComplaintService } from "@/servers/services/complaint.service";
 import { CustomerService } from "@/servers/services/customer.service";
 import { ReportService } from "@/servers/services/report.service";
@@ -10,6 +10,7 @@ import UsageStats from "@/components/root/user/customer/UsageStats";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { notFound } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -18,25 +19,24 @@ type PageProps = {
 export default async function TechnicianCustomerDetailPage({ params }: PageProps) {
   const { id } = await params;
   const customer = await CustomerService.getById(Number(id));
+  if (!customer) notFound();
+
   const reports = await ReportService.getByCustomerId(Number(id));
   const complaints = await ComplaintService.getByCustomerId(Number(id));
 
   return (
     <main className="min-h-screen w-full space-y-8 md:rounded-2xl">
-      <div className="flex flex-col items-start gap-4 justify-between lg:flex-row lg:items-center">
-        <div className="space-y-2">
+      <div className="space-y-4">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <DynamicBreadcrumb />
-          <PageHeader
-            title={`Pelanggan: ${customer?.fullname}`}
-            subtitle="Riwayat laporan dan keluhan pelanggan"
-          />
+          <Link href="/technician/my-reports/create" className="w-full sm:w-auto">
+            <Button className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 sm:w-auto">
+              <p className="text-lg font-semibold">Tambah Laporan</p>
+              <Plus className="size-5" />
+            </Button>
+          </Link>
         </div>
-        <Link href="/technician/my-reports/create" className="w-full sm:w-auto">
-          <Button className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 sm:w-auto">
-            <p className="text-lg font-semibold">Tambah Laporan</p>
-            <Plus className="size-5" />
-          </Button>
-        </Link>
+        <CustomerHeaderCard customer={customer} />
       </div>
 
       <div className="flex flex-col gap-6 lg:flex-row">

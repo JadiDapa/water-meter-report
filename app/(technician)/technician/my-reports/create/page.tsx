@@ -7,7 +7,7 @@ import { TechnicianService } from "@/servers/services/technician.service";
 
 export default async function TechnicianCreateReportPage() {
   const user = await getCurrentUser();
-  const customers = await CustomerService.getAll();
+  const customers = await CustomerService.getAllWithLatestReport();
   const technician = await TechnicianService.getByUserId(user.id);
 
   return (

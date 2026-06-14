@@ -10,6 +10,14 @@ export type CustomerType = Prisma.CustomerGetPayload<{
   };
 }>;
 
+export type CustomerWithLatestReport = Prisma.CustomerGetPayload<{
+  include: {
+    reports: {
+      select: { values: true; createdAt: true };
+    };
+  };
+}>;
+
 export const CustomerSearchSchema = z.object({
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(100).default(20),

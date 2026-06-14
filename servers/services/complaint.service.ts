@@ -115,6 +115,7 @@ export const ComplaintService = {
         customer: {
           include: {
             user: true,
+            bulding: true,
           },
         },
         technician: {
@@ -134,7 +135,10 @@ export const ComplaintService = {
 
     for (const file of images) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const { url, publicId } = await uploadImage(buffer, "water-meter/complaints");
+      const { url, publicId } = await uploadImage(
+        buffer,
+        "water-meter/complaints",
+      );
       imageRecords.push({ url, filename: publicId, size: file.size });
     }
 
@@ -174,7 +178,8 @@ export const ComplaintService = {
       where: { id },
       data: {
         status: dto.action,
-        cancellationReason: dto.action === "CANCELLED" ? dto.cancellationReason : null,
+        cancellationReason:
+          dto.action === "CANCELLED" ? dto.cancellationReason : null,
         resolvedAt: new Date(),
       },
     });
@@ -185,7 +190,9 @@ export const ComplaintService = {
   },
 
   async countPendingByTechnicianId(technicianId: number) {
-    return prisma.complaint.count({ where: { status: "PENDING", technicianId } });
+    return prisma.complaint.count({
+      where: { status: "PENDING", technicianId },
+    });
   },
 
   async delete(id: number) {

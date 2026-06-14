@@ -88,6 +88,7 @@ export const ReportService = {
         },
         images: true,
       },
+      orderBy: { createdAt: "desc" },
     });
   },
   async getByTechnicianId(technicianId: number) {
@@ -116,6 +117,7 @@ export const ReportService = {
         customer: {
           include: {
             user: true,
+            bulding: true,
           },
         },
         technician: {
@@ -154,7 +156,10 @@ export const ReportService = {
 
     for (const file of images) {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const { url, publicId } = await uploadImage(buffer, "water-meter/reports");
+      const { url, publicId } = await uploadImage(
+        buffer,
+        "water-meter/reports",
+      );
       imageRecords.push({ url, filename: publicId, size: file.size });
     }
 

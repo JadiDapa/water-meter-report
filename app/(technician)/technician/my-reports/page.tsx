@@ -8,11 +8,29 @@ import { TechnicianService } from "@/servers/services/technician.service";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import MonthYearFilter from "@/components/root/MonthYearFilter";
+import ExportReportButton from "@/components/root/reports/ExportReportButton";
+import {
+  parseMonthYear,
+  filterByMonthYear,
+  getAvailableYears,
+} from "@/lib/format";
 
-export default async function TechnicianMyReportsPage() {
+export default async function TechnicianMyReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}) {
+  const params = await searchParams;
+  const { month, year } = parseMonthYear(params.month, params.year);
+
   const user = await getCurrentUser();
   const technician = await TechnicianService.getByUserId(user.id);
-  const reports = technician ? await ReportService.getByTechnicianId(technician.id) : [];
+  const allReports = technician
+    ? await ReportService.getByTechnicianId(technician.id)
+    : [];
+  const years = getAvailableYears(allReports);
+  const reports = filterByMonthYear(allReports, { month, year });
 
   return (
     <main className="min-h-screen w-full space-y-6 md:rounded-2xl">
@@ -21,12 +39,16 @@ export default async function TechnicianMyReportsPage() {
           <DynamicBreadcrumb />
           <PageHeader title="Laporan Saya" subtitle="Semua laporan yang Anda buat" />
         </div>
-        <Link href="/technician/my-reports/create" className="w-full sm:w-auto">
-          <Button className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 sm:w-auto">
-            <p className="text-lg font-semibold">Tambah Laporan</p>
-            <Plus className="size-5" />
-          </Button>
-        </Link>
+        <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <MonthYearFilter month={month} year={year} years={years} />
+          <ExportReportButton reports={reports} month={month} year={year} />
+          <Link href="/technician/my-reports/create" className="w-full sm:w-auto">
+            <Button className="flex w-full cursor-pointer items-center justify-center gap-2 px-6 sm:w-auto">
+              <p className="text-lg font-semibold">Tambah Laporan</p>
+              <Plus className="size-5" />
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <ReportStats reports={reports} />

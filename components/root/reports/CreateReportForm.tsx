@@ -23,9 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Customer } from "@/generated/prisma";
+import { CustomerWithLatestReport } from "@/servers/validators/customer.validator";
 import { useRouter } from "next/navigation";
 import { X, ImagePlus, UploadCloud, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
@@ -46,7 +50,7 @@ export default function CreateReportDialog({
 }: {
   technicianId?: number;
   customerId?: number;
-  customers?: Customer[];
+  customers?: CustomerWithLatestReport[];
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -136,9 +140,41 @@ export default function CreateReportDialog({
     });
   }
 
+  // Ambil bacaan meteran dari report terakhir pelanggan.
+  // Field `values` bisa berupa angka biasa atau JSON {"current","previous"}.
+  function parseReading(values?: string): number {
+    if (!values) return 0;
+    try {
+      const parsed = JSON.parse(values);
+      if (parsed && typeof parsed === "object" && "current" in parsed) {
+        return Number(parsed.current) || 0;
+      }
+    } catch {
+      // bukan JSON, jatuh ke parsing angka biasa
+    }
+    return Number(values) || 0;
+  }
+
+  const selectedCustomerId = form.watch("customerId");
+  const selectedCustomer = customers?.find(
+    (c) => c.id === Number(selectedCustomerId),
+  );
+
+  // Lokasi pelanggan diambil dari alamat pelanggan terpilih.
+  const customerLocation = selectedCustomer?.address ?? "";
+
+  // Nilai sebelumnya = bacaan meteran terakhir pelanggan.
+  const previousValue = parseReading(selectedCustomer?.reports[0]?.values);
+
+  const currentInput = Number(form.watch("values")) || 0;
+  const usage = currentInput ? currentInput - previousValue : 0;
+
   return (
-    <section className="w-full max-w-lg">
-      <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
+    <section className="w-full">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="mt-4 grid grid-cols-2 gap-12"
+      >
         <FieldGroup>
           {customers && (
             <Controller
@@ -146,13 +182,19 @@ export default function CreateReportDialog({
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel>Customer</FieldLabel>
+                  <FieldLabel>Pelanggan</FieldLabel>
                   <Select
                     value={field.value ? String(field.value) : ""}
-                    onValueChange={field.onChange}
+                    onValueChange={(val) => {
+                      field.onChange(val);
+                      const cust = customers?.find((c) => c.id === Number(val));
+                      form.setValue("location", cust?.address ?? "", {
+                        shouldValidate: true,
+                      });
+                    }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={"Pilih Customer..."} />
+                      <SelectValue placeholder={"Pilih Pelanggan..."} />
                     </SelectTrigger>
                     <SelectContent>
                       {customers.map((b) => (
@@ -166,6 +208,13 @@ export default function CreateReportDialog({
               )}
             />
           )}
+
+          <div className="">
+            <p className="">Lokasi Pelanggan:</p>
+            <p className="text-primary/50 text-lg font-medium">
+              {customerLocation || "—"}
+            </p>
+          </div>
 
           {/* Date */}
           <Controller
@@ -202,30 +251,21 @@ export default function CreateReportDialog({
             )}
           />
 
-          {/* Location + Values */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
-            <Controller
-              name="location"
-              control={form.control}
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel>Location</FieldLabel>
-                  <InputGroup>
-                    <InputGroupInput
-                      {...field}
-                      placeholder="Lokasi pekerjaan"
-                    />
-                  </InputGroup>
-                </Field>
-              )}
-            />
+          {/* Values */}
+          <div className="grid grid-cols-2">
+            <div className="">
+              <p className="">Nilai Sebelumnya:</p>
+              <p className="text-primary/50 text-lg font-medium">
+                {previousValue} m³
+              </p>
+            </div>
 
             <Controller
               name="values"
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel>Values</FieldLabel>
+                  <FieldLabel>Nilai Sekarang</FieldLabel>
                   <InputGroup>
                     <InputGroupInput
                       {...field}
@@ -239,100 +279,12 @@ export default function CreateReportDialog({
             />
           </div>
 
-          {/* Image Uploader */}
-          <Field>
-            <FieldLabel>
-              Foto{" "}
-              <span className="text-muted-foreground ml-1 text-xs font-normal">
-                (opsional, bisa lebih dari 1)
-              </span>
-            </FieldLabel>
-
-            {/* Drop Zone */}
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => fileInputRef.current?.click()}
-              onKeyDown={(e) =>
-                e.key === "Enter" && fileInputRef.current?.click()
-              }
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className={[
-                "relative flex flex-col items-center justify-center gap-2",
-                "cursor-pointer rounded-xl border-2 border-dashed px-4 py-6",
-                "transition-colors duration-150 select-none",
-                isDragging
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/50 hover:bg-muted/40",
-              ].join(" ")}
-            >
-              <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
-                <UploadCloud className="text-muted-foreground h-5 w-5" />
-              </div>
-              <p className="text-foreground text-sm font-medium">
-                Klik atau seret foto ke sini
-              </p>
-              <p className="text-muted-foreground text-xs">
-                PNG, JPG, WEBP — bisa lebih dari satu
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="sr-only"
-                onChange={(e) => e.target.files && addImages(e.target.files)}
-              />
-            </div>
-
-            {/* Previews */}
-            {images.length > 0 && (
-              <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
-                {images.map((img, i) => (
-                  <div
-                    key={img.url}
-                    className="group border-border bg-muted relative aspect-square overflow-hidden rounded-lg border"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.url}
-                      alt={`Preview ${i + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(i)}
-                      className={[
-                        "absolute top-1 right-1 flex h-5 w-5 items-center justify-center",
-                        "rounded-full bg-black/60 text-white opacity-0 transition-opacity",
-                        "group-hover:opacity-100 hover:bg-black/80",
-                      ].join(" ")}
-                      aria-label="Hapus foto"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-
-                {/* Add more button */}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className={[
-                    "flex aspect-square flex-col items-center justify-center gap-1",
-                    "border-border rounded-lg border-2 border-dashed",
-                    "text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors",
-                  ].join(" ")}
-                  aria-label="Tambah foto"
-                >
-                  <ImagePlus className="h-5 w-5" />
-                  <span className="text-[10px] font-medium">Tambah</span>
-                </button>
-              </div>
-            )}
-          </Field>
+          <div className="">
+            <p className="text-lg font-medium">
+              Selisih / Pemakaian Bulan Ini:
+            </p>
+            <p className="text-primary text-2xl font-semibold">{usage} m³</p>
+          </div>
 
           <div className="mt-6">
             <Button
@@ -343,6 +295,101 @@ export default function CreateReportDialog({
             </Button>
           </div>
         </FieldGroup>
+
+        {/* Image Uploader */}
+        <Field className="border-s ps-12">
+          <FieldLabel>
+            Foto{" "}
+            <span className="text-muted-foreground ml-1 text-xs font-normal">
+              (opsional, bisa lebih dari 1)
+            </span>
+          </FieldLabel>
+
+          {/* Drop Zone */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) =>
+              e.key === "Enter" && fileInputRef.current?.click()
+            }
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={[
+              "relative flex flex-col items-center justify-center gap-2",
+              "cursor-pointer rounded-xl border-2 border-dashed px-4 py-6",
+              "transition-colors duration-150 select-none",
+              isDragging
+                ? "border-primary bg-primary/5"
+                : "border-border hover:border-primary/50 hover:bg-muted/40",
+            ].join(" ")}
+          >
+            <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+              <UploadCloud className="text-muted-foreground h-5 w-5" />
+            </div>
+            <p className="text-foreground text-sm font-medium">
+              Klik atau seret foto ke sini
+            </p>
+            <p className="text-muted-foreground text-xs">
+              PNG, JPG, WEBP — bisa lebih dari satu
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={(e) => e.target.files && addImages(e.target.files)}
+            />
+          </div>
+
+          {/* Previews */}
+          {images.length > 0 && (
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {images.map((img, i) => (
+                <div
+                  key={img.url}
+                  className="group border-border bg-muted relative aspect-square overflow-hidden rounded-lg border"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img.url}
+                    alt={`Preview ${i + 1}`}
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    className={[
+                      "absolute top-1 right-1 flex h-5 w-5 items-center justify-center",
+                      "rounded-full bg-black/60 text-white opacity-0 transition-opacity",
+                      "group-hover:opacity-100 hover:bg-black/80",
+                    ].join(" ")}
+                    aria-label="Hapus foto"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+
+              {/* Add more button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={[
+                  "flex aspect-square flex-col items-center justify-center gap-1",
+                  "border-border rounded-lg border-2 border-dashed",
+                  "text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors",
+                ].join(" ")}
+                aria-label="Tambah foto"
+              >
+                <ImagePlus className="h-5 w-5" />
+                <span className="text-[10px] font-medium">Tambah</span>
+              </button>
+            </div>
+          )}
+        </Field>
       </form>
     </section>
   );
