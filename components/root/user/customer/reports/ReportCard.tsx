@@ -14,25 +14,31 @@ import { id as localeId } from "date-fns/locale";
 export default function ReportCard({
   report,
   previousValue,
+  previousUsage,
 }: {
   report: ReportType;
   previousValue?: number;
+  previousUsage?: number;
 }) {
   const current = Number(report.values);
+  // Selisih / jumlah pemakaian pada bulan terkait.
   const usage = previousValue !== undefined ? current - previousValue : null;
-  const usagePositive = usage !== null && usage > 0;
-  const usageZero = usage === 0;
 
-  const UsageIcon = usageZero
-    ? Minus
-    : usagePositive
-      ? TrendingUp
-      : TrendingDown;
-  const usageColor = usageZero
+  // Persentase naik/turun dibanding pemakaian bulan sebelumnya.
+  const percentChange =
+    usage !== null && previousUsage !== undefined && previousUsage !== 0
+      ? ((usage - previousUsage) / Math.abs(previousUsage)) * 100
+      : null;
+
+  const trendUp = percentChange !== null && percentChange > 0;
+  const trendFlat = percentChange === 0;
+
+  const TrendIcon = trendFlat ? Minus : trendUp ? TrendingUp : TrendingDown;
+  const trendColor = trendFlat
     ? "text-muted-foreground"
-    : usagePositive
-      ? "text-blue-600 dark:text-blue-400"
-      : "text-green-600 dark:text-green-400";
+    : trendUp
+      ? "text-red-600 dark:text-red-400" // pemakaian naik
+      : "text-green-600 dark:text-green-400"; // pemakaian turun
 
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
@@ -76,44 +82,28 @@ export default function ReportCard({
           </span>
         </div>
 
-        {/* Water usage */}
-        <div className="h-28 rounded-xl bg-sky-50 p-3 dark:bg-sky-950/30">
+        {/* Pemakaian bulan ini */}
+        <div className="rounded-xl bg-sky-50 p-3 dark:bg-sky-950/30">
           <div className="mb-2 flex items-center gap-1.5">
             <Droplets className="h-4 w-4 text-sky-500" />
             <span className="text-xs font-semibold tracking-wide text-sky-700 uppercase dark:text-sky-400">
-              Pemakaian Air
+              Pemakaian Bulan Ini
             </span>
           </div>
-          <div
-            className={
-              previousValue !== undefined
-                ? "grid grid-cols-2 gap-2 text-sm"
-                : "text-sm"
-            }
-          >
-            <div>
-              <p className="text-muted-foreground text-xs">Sekarang</p>
-              <p className="font-semibold">
-                {current.toLocaleString("id-ID")} m³
-              </p>
-            </div>
-            {previousValue !== undefined && (
-              <div>
-                <p className="text-muted-foreground text-xs">Sebelumnya</p>
-                <p className="font-semibold">
-                  {previousValue.toLocaleString("id-ID")} m³
-                </p>
-              </div>
-            )}
-          </div>
-          {usage !== null && (
+          <p className="text-2xl leading-none font-extrabold text-sky-900 dark:text-sky-100">
+            {usage !== null ? usage.toLocaleString("id-ID") : "—"}
+            <span className="ml-1 text-base font-semibold">m³</span>
+          </p>
+          {percentChange !== null && (
             <div
-              className={`mt-2 flex items-center gap-1 text-xs font-semibold ${usageColor}`}
+              className={`mt-2 flex items-center gap-1 text-xs font-semibold ${trendColor}`}
             >
-              <UsageIcon className="h-3.5 w-3.5" />
-              {usageZero
-                ? "Tidak ada perubahan"
-                : `${usagePositive ? "+" : ""}${usage.toLocaleString("id-ID")} m³`}
+              <TrendIcon className="h-3.5 w-3.5" />
+              <span>
+                {trendFlat
+                  ? "Sama dengan bulan lalu"
+                  : `${trendUp ? "+" : ""}${percentChange.toFixed(1)}% dari bulan lalu`}
+              </span>
             </div>
           )}
         </div>

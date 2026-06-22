@@ -1,5 +1,6 @@
 import ComplaintCard from "@/components/root/user/customer/complaints/ComplaintCard";
 import ReportCard from "@/components/root/user/customer/reports/ReportCard";
+import { buildReportUsageHistory } from "@/components/root/user/customer/reports/report-usage";
 import DynamicBreadcrumb from "@/components/root/DynamicBreadcrumb";
 import CustomerHeaderCard from "@/components/root/user/customer/CustomerHeaderCard";
 import { ComplaintService } from "@/servers/services/complaint.service";
@@ -37,11 +38,17 @@ export default async function AdminCustomerDetailPage({ params }: PageProps) {
       <div>
         <h2 className="mb-4 text-lg font-semibold">Laporan Terbaru</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {reports.map((report) => (
-            <Link key={report.id} href={`/admin/reports/${report.id}`}>
-              <ReportCard report={report} />
-            </Link>
-          ))}
+          {buildReportUsageHistory(reports).map(
+            ({ report, previousValue, previousUsage }) => (
+              <Link key={report.id} href={`/admin/reports/${report.id}`}>
+                <ReportCard
+                  report={report}
+                  previousValue={previousValue}
+                  previousUsage={previousUsage}
+                />
+              </Link>
+            ),
+          )}
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { ComplaintService } from "@/servers/services/complaint.service";
 import WaterUsageChart from "@/components/root/user/customer/WaterUsageChart";
 import UsageStats from "@/components/root/user/customer/UsageStats";
 import ReportCard from "@/components/root/user/customer/reports/ReportCard";
+import { buildReportUsageHistory } from "@/components/root/user/customer/reports/report-usage";
 import ComplaintCard from "@/components/root/user/customer/complaints/ComplaintCard";
 import PendingComplaintBanner from "@/components/root/user/customer/complaints/PendingComplaintBanner";
 import CustomerHeaderCard from "@/components/root/user/customer/CustomerHeaderCard";
@@ -75,16 +76,17 @@ export default async function CustomerHomePage() {
           <p className="text-muted-foreground text-sm">Belum ada laporan.</p>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {reports.map((report, i) => (
-              <Link key={report.id} href={`/customer/reports/${report.id}`}>
-                <ReportCard
-                  report={report}
-                  previousValue={
-                    i > 0 ? Number(reports[i - 1].values) : undefined
-                  }
-                />
-              </Link>
-            ))}
+            {buildReportUsageHistory(reports).map(
+              ({ report, previousValue, previousUsage }) => (
+                <Link key={report.id} href={`/customer/reports/${report.id}`}>
+                  <ReportCard
+                    report={report}
+                    previousValue={previousValue}
+                    previousUsage={previousUsage}
+                  />
+                </Link>
+              ),
+            )}
           </div>
         )}
       </div>
