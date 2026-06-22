@@ -74,7 +74,15 @@ export default async function AdminComplaintDetailPage({
         resolvedAt={complaint.resolvedAt}
       />
 
-      <EvidenceSection images={complaint.images} />
+      <EvidenceSection
+        images={complaint.images.filter((img) => img.kind === "INITIAL")}
+        title="Bukti Keluhan"
+      />
+      <EvidenceSection
+        images={complaint.images.filter((img) => img.kind === "RESOLUTION")}
+        title="Bukti Penyelesaian"
+        hideWhenEmpty
+      />
     </main>
   );
 }

@@ -58,3 +58,18 @@ export async function resolveComplaint(
   revalidatePath("/technician/my-complaints");
   revalidatePath(`/technician/my-complaints/${complaintId}`);
 }
+
+export async function finishComplaint(
+  complaintId: number,
+  formData: FormData,
+) {
+  const images = formData
+    .getAll("images")
+    .filter((f) => f instanceof File && f.size > 0) as File[];
+
+  await ComplaintService.finish(complaintId, images);
+  revalidatePath("/admin/complaints");
+  revalidatePath(`/admin/complaints/${complaintId}`);
+  revalidatePath("/technician/my-complaints");
+  revalidatePath(`/technician/my-complaints/${complaintId}`);
+}

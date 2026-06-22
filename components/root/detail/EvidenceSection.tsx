@@ -41,12 +41,21 @@ function EvidenceGallery({ images }: { images: { url: string }[] }) {
 /**
  * "Bukti" card: section header with image count plus the evidence grid.
  * Used on every report/complaint detail page.
+ *
+ * `title` defaults to "Bukti". Set `hideWhenEmpty` to skip rendering entirely
+ * when there are no images (used for the optional resolution evidence group).
  */
 export default function EvidenceSection({
   images,
+  title = "Bukti",
+  hideWhenEmpty = false,
 }: {
   images: { url: string }[];
+  title?: string;
+  hideWhenEmpty?: boolean;
 }) {
+  if (hideWhenEmpty && images.length === 0) return null;
+
   return (
     <div className="bg-card ring-border space-y-4 rounded-xl border p-5 ring-1">
       <div className="flex items-center gap-2.5">
@@ -55,7 +64,7 @@ export default function EvidenceSection({
         </div>
         <div>
           <p className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
-            Bukti
+            {title}
           </p>
           <p className="text-muted-foreground text-[13px] font-medium">
             {images.length} gambar terlampir

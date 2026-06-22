@@ -27,7 +27,11 @@
       "PowerShell(npx tsc --noEmit)",
       "Bash(npx tsc *)",
       "PowerShell(npx tsc --noEmit 2>&1)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "PowerShell(npx prisma migrate dev --name add_image_kind)",
+      "PowerShell(npx prisma generate)",
+      "PowerShell($p = \".env\"; $c = Get-Content $p -Raw; $c = $c -replace '\\(?m\\)^DIRENT_URL=', 'DIRECT_URL='; Set-Content -Path $p -Value $c -NoNewline -Encoding utf8; Select-String -Path $p -Pattern '^DIRECT_URL=' | ForEach-Object { \"DIRECT_URL key present: yes\" })",
+      "PowerShell($out = npx tsc --noEmit 2>&1; $kind = $out | Select-String -Pattern \"kind\"; if \\($kind\\) { Write-Output \"KIND ERRORS REMAIN:\"; $kind } else { Write-Output \"No 'kind' errors. Total remaining \\(pre-existing\\) errors:\"; \\($out | Select-String -Pattern 'error TS'\\).Count })"
     ]
   }
 }

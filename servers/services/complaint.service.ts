@@ -185,6 +185,38 @@ export const ComplaintService = {
     });
   },
 
+  async finish(id: number, images: File[] = []) {
+    const imageRecords: {
+      url: string;
+      filename: string;
+      size: number;
+      kind: "RESOLUTION";
+    }[] = [];
+
+    for (const file of images) {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const { url, publicId } = await uploadImage(
+        buffer,
+        "water-meter/complaints",
+      );
+      imageRecords.push({
+        url,
+        filename: publicId,
+        size: file.size,
+        kind: "RESOLUTION",
+      });
+    }
+
+    return prisma.complaint.update({
+      where: { id },
+      data: {
+        status: "FINISHED",
+        resolvedAt: new Date(),
+        images: { createMany: { data: imageRecords } },
+      },
+    });
+  },
+
   async countPending() {
     return prisma.complaint.count({ where: { status: "PENDING" } });
   },
