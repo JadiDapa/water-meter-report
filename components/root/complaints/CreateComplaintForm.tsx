@@ -15,13 +15,7 @@ import {
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { CreateComplaintSchema } from "@/servers/validators/complaint.validator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomerCombobox } from "@/components/root/CustomerCombobox";
 import { Customer } from "@/generated/prisma";
 import { useRouter } from "next/navigation";
 import { X, ImagePlus, UploadCloud } from "lucide-react";
@@ -153,27 +147,16 @@ export default function CreateComplaintForm({
               render={({ field }) => (
                 <Field>
                   <FieldLabel>Pelanggan</FieldLabel>
-                  <Select
-                    value={field.value ? String(field.value) : ""}
-                    onValueChange={(val) => {
-                      field.onChange(val);
-                      const cust = customers?.find((c) => c.id === Number(val));
+                  <CustomerCombobox
+                    customers={customers}
+                    value={field.value}
+                    onChange={(cust) => {
+                      field.onChange(cust?.id ?? 0);
                       form.setValue("location", cust?.address ?? "", {
                         shouldValidate: true,
                       });
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={"Pilih Pelanggan..."} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers.map((b) => (
-                        <SelectItem key={b.id} value={b.id.toString()}>
-                          {b.fullname} - {b.customerId}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </Field>
               )}
             />
